@@ -40,8 +40,8 @@ async def on_message(message):
 
     if message.content=='$help':
         embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
-        embed.add_field(name = "Command to greet Hugo" , value = "stfu hugo" , inline = False)
-        embed.add_field(name = "Command to print out random message" , value = "$random" , inline = False)
+        embed.add_field(name = "Command to greet Hugo" , value = "$hello" , inline = False)
+        embed.add_field(name = "Command to print out random message" , value = "$randommsg" , inline = False)
         embed.add_field(name = "Command to generate a random color" , value = "$color" , inline = False)
         await message.channel.send(embed = embed)
 
