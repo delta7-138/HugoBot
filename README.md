@@ -1,13 +1,13 @@
 # Hugo Bot 
-This discord bot does cool stuff like randomly generates a color, randomly picks old messages by users embeds them and sends them and greets you. 
+This discord bot does cool stuff like randomly generates a color, generates random names and sends pictures of the Martian surface as taken by the Curiosity rover. 
 
 Will keep adding functionalities as and when I get more ideas. 
 
-## $randommsg
+## +randommsg
 To randomly print message
 
-## $hello
+## +hello
 To greet 
 
-## $color
+## +color
 Randomly generate color
