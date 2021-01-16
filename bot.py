@@ -21,7 +21,7 @@ async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
     embed.add_field(name = "Command to greet Hugo" , value = "+hello" , inline = False)
     embed.add_field(name = "Command to generate a random color" , value = "+color" , inline = False)
-    embed.add_field(name = "Command to generate random name" , value = "+randomname" , inline = False)
+    embed.add_field(name = "Command to generate random name" , value = "+randomname ``number_of_name``" , inline = False)
     embed.add_field(name = "Command to get MARS rover(Curiosity)" , value = "+mars ``sol_number``" , inline = False)
     await ctx.send(embed = embed)
 
