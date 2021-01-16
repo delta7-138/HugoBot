@@ -3,7 +3,7 @@ This discord bot does cool stuff like randomly generates a color, generates rand
 
 Will keep adding functionalities as and when I get more ideas. 
 
-## +randommsg
+## +randomname (alias : +rand)
 To randomly print message
 
 ## +hello
@@ -11,3 +11,6 @@ To greet
 
 ## +color
 Randomly generate color
+
+## +mars {sol}
+On Entering sol number for Curiosity rover by NASA you get the image captured on that sol by the rover. Uses NASA API
