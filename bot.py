@@ -22,7 +22,7 @@ async def help(ctx):
     embed.add_field(name = "Command to greet Hugo" , value = "+hello" , inline = False)
     embed.add_field(name = "Command to generate a random color" , value = "+color" , inline = False)
     embed.add_field(name = "Command to generate random name" , value = "+randomname ``number_of_names``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "+mars ``sol_number``" , inline = False)
+    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "+mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]``" , inline = False)
     embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "+apod" , inline = False)
     await ctx.send(embed = embed)
 
@@ -77,14 +77,18 @@ async def randomname(ctx , *args):
         await ctx.send(name)
     else:
         await ctx.send("Send valid arguments ya :nerd:")
+
 @client.command()
-async def mars(ctx , * , sol):
+async def mars(ctx , *args):
     try:
-        gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=' + sol + '&api_key=' + API_TOKEN)
+        sol = args[0]
+        cam = args[1].lower()
+        gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=' + sol + '&camera=' + cam + '&api_key=' + API_TOKEN)
         gdata = gres.json()
-        await ctx.send(gdata['photos'][0]['img_src'])
+        ind = random.randint(0 , len(gdata['photos'])-1)
+        await ctx.send(gdata['photos'][ind]['img_src'])
     except: 
-        await ctx.send('Sol number out of range :pensive:')
+        await ctx.send('Image not available :pensive:')
 
 @client.command()
 async def apod(ctx):
