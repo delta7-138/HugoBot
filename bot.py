@@ -48,13 +48,34 @@ async def color(ctx):
     await ctx.send(file = file , embed = embed) 
 
 @client.command(aliases = ['rand'])
-async def randomname(ctx):
-    f_ind = random.randint(0 , len(first_names)-1)
-    l_ind = random.randint(0 , len(last_names)-1)
-    random.shuffle(first_names)
-    random.shuffle(last_names)
-    await ctx.send(first_names[f_ind] + " " + last_names[l_ind])
+async def randomname(ctx , *args):
+    if(len(args)==1):
+        num = int(args[0])
+        if(num<=5 and num>0):
+            final_msg = ""
+            for i in range(num):
+                f_ind = random.randint(0 , len(first_names)-1)
+                l_ind = random.randint(0 , len(last_names)-1)
+                random.shuffle(first_names)
+                random.shuffle(last_names)
+                name = first_names[f_ind] + " " + last_names[l_ind]
+                final_msg = final_msg + name + "\n"
+                    
+            await ctx.send(final_msg)
 
+        elif(num==0):
+            await ctx.send("Do you really want a name or you just want to waste my time?") 
+        else:
+            await ctx.send("How many names do you need man! :nerd:")
+    elif(len(args)==0):
+        f_ind = random.randint(0 , len(first_names)-1)
+        l_ind = random.randint(0 , len(last_names)-1)
+        random.shuffle(first_names)
+        random.shuffle(last_names)
+        name = first_names[f_ind] + " " + last_names[l_ind]
+        await ctx.send(name)
+    else:
+        await ctx.send("Send valid arguments ya :nerd:")
 @client.command()
 async def mars(ctx , * , sol):
     try:
