@@ -2,7 +2,7 @@ import discord
 import os
 import random
 import requests
-import lyricsgenius
+
 from dotenv import load_dotenv
 from discord.ext import commands
 from PIL import Image
@@ -21,8 +21,9 @@ async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
     embed.add_field(name = "Command to greet Hugo" , value = "+hello" , inline = False)
     embed.add_field(name = "Command to generate a random color" , value = "+color" , inline = False)
-    embed.add_field(name = "Command to generate random name" , value = "+randomname ``number_of_name``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover(Curiosity)" , value = "+mars ``sol_number``" , inline = False)
+    embed.add_field(name = "Command to generate random name" , value = "+randomname ``number_of_names``" , inline = False)
+    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "+mars ``sol_number``" , inline = False)
+    embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "+apod" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -85,4 +86,13 @@ async def mars(ctx , * , sol):
     except: 
         await ctx.send('Sol number out of range :pensive:')
 
+@client.command()
+async def apod(ctx):
+    gres = requests.get('https://api.nasa.gov/planetary/apod?api_key=' + API_TOKEN)
+    gdata = gres.json()
+    embed = discord.Embed(title = 'Astronomy Picture Of the Day' , color = 0x0000ff)
+    embed.add_field(name = 'Date' , value = gdata['date'])
+    embed.add_field(name = gdata['title'] , value = gdata['explanation'])
+    embed.set_image(url = gdata['hdurl'])
+    await ctx.send(embed = embed)
 client.run(TOKEN)
