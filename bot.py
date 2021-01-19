@@ -2,6 +2,7 @@ import discord
 import os
 import random
 import requests
+import datetime as dt
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -16,14 +17,27 @@ client.remove_command('help')
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
+# @client.event
+# async def on_message(message):
+#     if(message.author==client.user):
+#         return 
+#     l_w = message.content.split(' ')
+#     for i in range(len(l_w)):
+#         l_w[i] = l_w[i].lower()
+
+#     if("binod" in l_w):
+#         await message.channel.send('Binod')
+    
+
 @client.command()
 async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
     embed.add_field(name = "Command to greet Hugo" , value = "+hello" , inline = False)
     embed.add_field(name = "Command to generate a random color" , value = "+color" , inline = False)
     embed.add_field(name = "Command to generate random name" , value = "+randomname ``number_of_names``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "+mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]``" , inline = False)
+    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "+mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
     embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "+apod" , inline = False)
+    embed.add_field(name = "Command to get random number" , value = "+randomnum or +nrand ``lowerbound`` ``upperbound``" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -80,15 +94,23 @@ async def randomname(ctx , *args):
 
 @client.command()
 async def mars(ctx , *args):
-    try:
+    if(len(args)==1):
         sol = args[0]
-        cam = args[1].lower()
-        gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=' + sol + '&camera=' + cam + '&api_key=' + API_TOKEN)
+        gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=' + sol + '&camera=fhaz&api_key=' + API_TOKEN)
         gdata = gres.json()
         ind = random.randint(0 , len(gdata['photos'])-1)
         await ctx.send(gdata['photos'][ind]['img_src'])
-    except: 
-        await ctx.send('Image not available :pensive:')
+    else:
+        try:
+            sol = args[0]
+            cam = args[1].lower()
+            rover = args[2].lower()
+            gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/' + rover + '/photos?sol=' + sol + '&camera=' + cam + '&api_key=' + API_TOKEN)
+            gdata = gres.json()
+            ind = random.randint(0 , len(gdata['photos'])-1)
+            await ctx.send(gdata['photos'][ind]['img_src'])
+        except: 
+            await ctx.send('Image not available :pensive:')
 
 @client.command()
 async def apod(ctx):
@@ -96,7 +118,23 @@ async def apod(ctx):
     gdata = gres.json()
     embed = discord.Embed(title = 'Astronomy Picture Of the Day' , color = 0x0000ff)
     embed.add_field(name = 'Date' , value = gdata['date'])
-    embed.add_field(name = gdata['title'] , value = gdata['explanation'])
+    # embed.add_field(name = gdata['title'] , value = gdata['explanation'])
     embed.set_image(url = gdata['hdurl'])
     await ctx.send(embed = embed)
+
+@client.command(aliases = ['nrand'])
+async def randomnum(ctx , *args):
+    try:
+        num1 = int(args[0])
+        num2 = int(args[1])
+        if(num1>num2):
+            await ctx.send('First argument should be less than the second one')
+        elif(num1==num2):
+            await ctx.send('Do you really want a random number :|')
+        else:
+            randnum = random.randint(num1 , num2)
+            await ctx.send(randnum)
+    except:
+        await ctx.send('Please send valid input :pleading_face:')
+
 client.run(TOKEN)
