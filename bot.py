@@ -3,6 +3,7 @@ import os
 import random
 import requests
 import datetime as dt
+import math 
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -11,33 +12,34 @@ from listofnames import first_names,last_names
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 API_TOKEN = os.getenv('API_TOKEN')
-client = commands.Bot(command_prefix = '+')
+client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
+modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
+def randomGen(num):
+    val = (random.randint(1 , num))**2
+    tmpvar = val
+    ans = 0
+    for i in range(2):
+        ans = ans * 10 + tmpvar%10
+        tmpvar = tmpvar/10
+
+    return int(ans)
+    
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
-# @client.event
-# async def on_message(message):
-#     if(message.author==client.user):
-#         return 
-#     l_w = message.content.split(' ')
-#     for i in range(len(l_w)):
-#         l_w[i] = l_w[i].lower()
-
-#     if("binod" in l_w):
-#         await message.channel.send('Binod')
     
 
 @client.command()
 async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
-    embed.add_field(name = "Command to greet Hugo" , value = "+hello" , inline = False)
-    embed.add_field(name = "Command to generate a random color" , value = "+color" , inline = False)
-    embed.add_field(name = "Command to generate random name" , value = "+randomname ``number_of_names``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "+mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
-    embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "+apod" , inline = False)
-    embed.add_field(name = "Command to get random number" , value = "+randomnum or +nrand ``lowerbound`` ``upperbound``" , inline = False)
+    embed.add_field(name = "Command to greet Hugo" , value = "`hello" , inline = False)
+    embed.add_field(name = "Command to generate a random color" , value = "`color" , inline = False)
+    embed.add_field(name = "Command to generate random name" , value = "`randomname ``number_of_names``" , inline = False)
+    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "`mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
+    embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "`apod" , inline = False)
+    embed.add_field(name = "Command to get random number" , value = "`randomnum or `nrand ``lowerbound`` ``upperbound``" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -102,9 +104,11 @@ async def mars(ctx , *args):
         await ctx.send(gdata['photos'][ind]['img_src'])
     else:
         try:
+            reference_args = {'o' : 'opportunity' , 'c' : 'curiosity' , 's' : 'spirit'}
             sol = args[0]
             cam = args[1].lower()
-            rover = args[2].lower()
+            rover = reference_args[args[2].lower()]
+            #print(rover)
             gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/' + rover + '/photos?sol=' + sol + '&camera=' + cam + '&api_key=' + API_TOKEN)
             gdata = gres.json()
             ind = random.randint(0 , len(gdata['photos'])-1)
@@ -137,4 +141,31 @@ async def randomnum(ctx , *args):
     except:
         await ctx.send('Please send valid input :pleading_face:')
 
+@client.command(aliases = ['sg'])
+async def shoegaze(ctx , member :  discord.Member): 
+    im = Image.open(requests.get(member.avatar_url , stream = True).raw)
+    pixels = im.load()
+    for i in range(im.size[0]):
+        for j in range(im.size[1]):
+            tmp = list(pixels[i , j]) 
+            k = random.randint(0 , 2)
+            l = random.randint(0 , 2)
+            random.seed(modes[random.randint(0 , 9)])
+            tmp[k] = randomGen(random.randint(156 , 255))
+            tmp[l] = randomGen(random.randint(1 , 255))
+            im.putpixel((i , j) , tuple(tmp))
+        
+    im.save('avatar.png')
+    fil = discord.File('avatar.png')
+    embed = discord.Embed(title = "Here is a shoegaze version of your av")
+    embed.set_image(url = 'attachment://avatar.png')  
+    await ctx.send(file = fil , embed = embed) 
+             
+# @shoegaze.error
+# async def shoegaze_err(ctx , err):
+#     if isinstance(err , commands.MissingRequiredArgument):
+#         await ctx.send('Dude atleast tag someone :unamused:')
+
+#     if isinstance(err , commands.BadArgument):
+#         await ctx.send('Dude atleast tag a valid member :unamused:')
 client.run(TOKEN)
