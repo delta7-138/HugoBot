@@ -3,7 +3,8 @@ import os
 import random
 import requests
 import datetime as dt
-import math 
+from math import *
+import numpy as np
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -28,6 +29,17 @@ def randomGen(num):
 def randomizeImage(url):
     im = Image.open(requests.get(url , stream = True).raw)
     pixels = im.load()
+    xmax = im.size[0]
+    ymid = im.size[1]/2
+
+    # xarr = list(range(0 , xmax-3))
+
+    # yarr = list(map(sin , xarr))
+    # for i in range(len(yarr)):
+    #     yarr[i] = int(ymid + floor(ymid/3 * yarr[i]))
+    #     print(yarr[i])
+
+    
     for i in range(im.size[0]):
         for j in range(im.size[1]):
             tmp = list(pixels[i , j]) 
@@ -37,7 +49,12 @@ def randomizeImage(url):
             tmp[k] = randomGen(random.randint(156 , 255))
             tmp[l] = randomGen(random.randint(1 , 255))
             im.putpixel((i , j) , tuple(tmp))
+
+    # for i in range(xmax-3):
+    #     if(yarr[i]>=0 and yarr[i]<=2 * ymid):
+    #         im.putpixel((xarr[i] , yarr[i]) , (0 , 0 ,0))
     return im
+
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -47,12 +64,12 @@ async def on_ready():
 @client.command()
 async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
-    embed.add_field(name = "Command to greet Hugo" , value = "`hello" , inline = False)
-    embed.add_field(name = "Command to generate a random color" , value = "`color" , inline = False)
-    embed.add_field(name = "Command to generate random name" , value = "`randomname ``number_of_names``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "`mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
-    embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "`apod" , inline = False)
-    embed.add_field(name = "Command to get random number" , value = "`randomnum or `nrand ``lowerbound`` ``upperbound``" , inline = False)
+    embed.add_field(name = "Command to greet Hugo" , value = "h.hello" , inline = False)
+    embed.add_field(name = "Command to generate a random color" , value = "h.color" , inline = False)
+    embed.add_field(name = "Command to generate random name" , value = "h.randomname ``number_of_names``" , inline = False)
+    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "h.mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
+    embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "h.apod" , inline = False)
+    embed.add_field(name = "Command to get random number" , value = "h.randomnum or h.nrand ``lowerbound`` ``upperbound``" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -156,11 +173,16 @@ async def randomnum(ctx , *args):
 
 @client.command(aliases = ['sg'])
 async def shoegaze(ctx , member :  discord.Member): 
-    im = randomizeImage(member.avatar_url)    
-    im.save('avatar.png')
-    fil = discord.File('avatar.png')
+    im = randomizeImage(member.avatar_url)   
+    ext = 'png' 
+    if(im.format=='GIF'):
+        im.save('avatar.gif' , save_all = True)
+        ext = 'gif'
+    else:
+        im.save('avatar.png')
+    fil = discord.File('avatar.' + ext)
     embed = discord.Embed(title = "Here is a shoegaze version of your avatar")
-    embed.set_image(url = 'attachment://avatar.png')  
+    embed.set_image(url = 'attachment://avatar.' + ext)  
     await ctx.send(file = fil , embed = embed) 
              
 @shoegaze.error
