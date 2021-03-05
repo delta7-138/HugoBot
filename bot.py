@@ -25,6 +25,19 @@ def randomGen(num):
 
     return int(ans)
     
+def randomizeImage(url):
+    im = Image.open(requests.get(url , stream = True).raw)
+    pixels = im.load()
+    for i in range(im.size[0]):
+        for j in range(im.size[1]):
+            tmp = list(pixels[i , j]) 
+            k = random.randint(0 , 2)
+            l = random.randint(0 , 2)
+            random.seed(modes[random.randint(0 , 9)])
+            tmp[k] = randomGen(random.randint(156 , 255))
+            tmp[l] = randomGen(random.randint(1 , 255))
+            im.putpixel((i , j) , tuple(tmp))
+    return im
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
@@ -143,29 +156,23 @@ async def randomnum(ctx , *args):
 
 @client.command(aliases = ['sg'])
 async def shoegaze(ctx , member :  discord.Member): 
-    im = Image.open(requests.get(member.avatar_url , stream = True).raw)
-    pixels = im.load()
-    for i in range(im.size[0]):
-        for j in range(im.size[1]):
-            tmp = list(pixels[i , j]) 
-            k = random.randint(0 , 2)
-            l = random.randint(0 , 2)
-            random.seed(modes[random.randint(0 , 9)])
-            tmp[k] = randomGen(random.randint(156 , 255))
-            tmp[l] = randomGen(random.randint(1 , 255))
-            im.putpixel((i , j) , tuple(tmp))
-        
+    im = randomizeImage(member.avatar_url)    
     im.save('avatar.png')
     fil = discord.File('avatar.png')
-    embed = discord.Embed(title = "Here is a shoegaze version of your av")
+    embed = discord.Embed(title = "Here is a shoegaze version of your avatar")
     embed.set_image(url = 'attachment://avatar.png')  
     await ctx.send(file = fil , embed = embed) 
              
-# @shoegaze.error
-# async def shoegaze_err(ctx , err):
-#     if isinstance(err , commands.MissingRequiredArgument):
-#         await ctx.send('Dude atleast tag someone :unamused:')
+@shoegaze.error
+async def shoegaze_err(ctx , err):
+     if isinstance(err , commands.MissingRequiredArgument):
+        im = randomizeImage(ctx.message.author.avatar_url)    
+        im.save('avatar.png')
+        fil = discord.File('avatar.png')
+        embed = discord.Embed(title = "Here is a shoegaze version of your avatar")
+        embed.set_image(url = 'attachment://avatar.png')  
+        await ctx.send(file = fil , embed = embed) 
 
-#     if isinstance(err , commands.BadArgument):
-#         await ctx.send('Dude atleast tag a valid member :unamused:')
+     if isinstance(err , commands.BadArgument):
+         await ctx.send('Dude atleast tag a valid member :unamused:')
 client.run(TOKEN)
