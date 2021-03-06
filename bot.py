@@ -16,6 +16,18 @@ API_TOKEN = os.getenv('API_TOKEN')
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
+def distortImage(im):
+    pixels = im.load()
+    for i in range(im.size[0]):
+        for j in range(im.size[1]):
+            k = (random.randint(0 , 12))
+            l = (random.randint(0 , 12))
+            k = k**2
+            if(i+k<im.size[0] and j+l<im.size[1]):
+                tmp = list(pixels[i+k , j+l])
+                im.putpixel((i , j) , tuple(tmp))    
+    return im
+
 def randomGen(num):
     val = (random.randint(1 , num))**2
     tmpvar = val
@@ -70,6 +82,8 @@ async def help(ctx):
     embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "h.mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
     embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "h.apod" , inline = False)
     embed.add_field(name = "Command to get random number" , value = "h.randomnum or h.nrand ``lowerbound`` ``upperbound``" , inline = False)
+    embed.add_field(name = "Command to get shoegaze avatar" , value = "h.shoegaze or h.sg" , inline = False)
+    embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -174,6 +188,7 @@ async def randomnum(ctx , *args):
 @client.command(aliases = ['sg'])
 async def shoegaze(ctx , member :  discord.Member): 
     im = randomizeImage(member.avatar_url)   
+    im = distortImage(im)
     ext = 'png' 
     if(im.format=='GIF'):
         im.save('avatar.gif' , save_all = True)
@@ -189,6 +204,7 @@ async def shoegaze(ctx , member :  discord.Member):
 async def shoegaze_err(ctx , err):
      if isinstance(err , commands.MissingRequiredArgument):
         im = randomizeImage(ctx.message.author.avatar_url)    
+        im = distortImage(im)
         im.save('avatar.png')
         fil = discord.File('avatar.png')
         embed = discord.Embed(title = "Here is a shoegaze version of your avatar")
@@ -197,4 +213,17 @@ async def shoegaze_err(ctx , err):
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
+
+@client.command(aliases = ['sgi'])
+async def shoegazeimage(ctx , * , text):
+    try: 
+        im = randomizeImage(text)
+        im = distortImage(im)
+        im.save('avatar.png')
+        fil = discord.File('avatar.png')
+        embed = discord.Embed(title = "Here is a shoegaze version of the image")
+        embed.set_image(url = 'attachment://avatar.png')  
+        await ctx.send(file = fil , embed = embed) 
+    except:
+        await ctx.send("invalid url :pensive:")
 client.run(TOKEN)
