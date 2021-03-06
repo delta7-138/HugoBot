@@ -16,12 +16,13 @@ API_TOKEN = os.getenv('API_TOKEN')
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
+
 def distortImage(im):
     pixels = im.load()
     for i in range(im.size[0]):
         for j in range(im.size[1]):
-            k = (random.randint(0 , 12))
-            l = (random.randint(0 , 12))
+            k = (random.randint(0 , int(floor(im.size[0]/66))))
+            l = (random.randint(0 , int(floor(im.size[1]/66))))
             k = k**2
             if(i+k<im.size[0] and j+l<im.size[1]):
                 tmp = list(pixels[i+k , j+l])
@@ -188,6 +189,33 @@ async def randomnum(ctx , *args):
 @client.command(aliases = ['sg'])
 async def shoegaze(ctx , member :  discord.Member): 
     im = randomizeImage(member.avatar_url)   
+    ext = 'png' 
+    if(im.format=='GIF'):
+        im.save('avatar.gif' , save_all = True)
+        ext = 'gif'
+    else:
+        im.save('avatar.png')
+    fil = discord.File('avatar.' + ext)
+    embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
+    embed.set_image(url = 'attachment://avatar.' + ext)  
+    await ctx.send(file = fil , embed = embed) 
+             
+@shoegaze.error
+async def shoegaze_err(ctx , err):
+     if isinstance(err , commands.MissingRequiredArgument):
+        im = randomizeImage(ctx.message.author.avatar_url)    
+        im.save('avatar.png')
+        fil = discord.File('avatar.png')
+        embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
+        embed.set_image(url = 'attachment://avatar.png')  
+        await ctx.send(file = fil , embed = embed) 
+
+     if isinstance(err , commands.BadArgument):
+         await ctx.send('Dude atleast tag a valid member :unamused:')
+
+@client.command(aliases = ['sgd'])
+async def shoegazedistort(ctx , member :  discord.Member): 
+    im = randomizeImage(member.avatar_url)   
     im = distortImage(im)
     ext = 'png' 
     if(im.format=='GIF'):
@@ -196,34 +224,36 @@ async def shoegaze(ctx , member :  discord.Member):
     else:
         im.save('avatar.png')
     fil = discord.File('avatar.' + ext)
-    embed = discord.Embed(title = "Here is a shoegaze version of your avatar")
+    embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
     embed.set_image(url = 'attachment://avatar.' + ext)  
     await ctx.send(file = fil , embed = embed) 
              
-@shoegaze.error
-async def shoegaze_err(ctx , err):
+@shoegazedistort.error
+async def shoegazed_err(ctx , err):
      if isinstance(err , commands.MissingRequiredArgument):
         im = randomizeImage(ctx.message.author.avatar_url)    
         im = distortImage(im)
         im.save('avatar.png')
         fil = discord.File('avatar.png')
-        embed = discord.Embed(title = "Here is a shoegaze version of your avatar")
+        embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
-
 @client.command(aliases = ['sgi'])
-async def shoegazeimage(ctx , * , text):
-    try: 
-        im = randomizeImage(text)
-        im = distortImage(im)
+async def shoegazeimage(ctx , *args):
+    #try: 
+        im = randomizeImage(args[0])
+        addage = ""
+        if(len(args)==2 and args[1]=='-d'):
+            im = distortImage(im)
+            addage = " with distortion"
         im.save('avatar.png')
         fil = discord.File('avatar.png')
-        embed = discord.Embed(title = "Here is a shoegaze version of the image")
+        embed = discord.Embed(title = "Here is a shoegaze version of the image" + addage)
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
-    except:
-        await ctx.send("invalid url :pensive:")
+    #except:
+    #   await ctx.send("invalid url :pensive:")
 client.run(TOKEN)
