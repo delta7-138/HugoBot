@@ -10,6 +10,8 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from PIL import Image
 from listofnames import first_names,last_names
+from io import BytesIO
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 API_TOKEN = os.getenv('API_TOKEN')
@@ -18,6 +20,7 @@ client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 
 def distortImage(im):
+    im = im.convert('RGB')
     pixels = im.load()
     for i in range(im.size[0]):
         for j in range(im.size[1]):
@@ -39,18 +42,11 @@ def randomGen(num):
 
     return int(ans)
     
-def randomizeImage(url):
-    im = Image.open(requests.get(url , stream = True).raw)
+def randomizeImage(im):
+    im = im.convert('RGB')
     pixels = im.load()
     xmax = im.size[0]
     ymid = im.size[1]/2
-
-    # xarr = list(range(0 , xmax-3))
-
-    # yarr = list(map(sin , xarr))
-    # for i in range(len(yarr)):
-    #     yarr[i] = int(ymid + floor(ymid/3 * yarr[i]))
-    #     print(yarr[i])
 
     
     for i in range(im.size[0]):
@@ -63,9 +59,6 @@ def randomizeImage(url):
             tmp[l] = randomGen(random.randint(1 , 255))
             im.putpixel((i , j) , tuple(tmp))
 
-    # for i in range(xmax-3):
-    #     if(yarr[i]>=0 and yarr[i]<=2 * ymid):
-    #         im.putpixel((xarr[i] , yarr[i]) , (0 , 0 ,0))
     return im
 
 @client.event
@@ -80,11 +73,12 @@ async def help(ctx):
     embed.add_field(name = "Command to greet Hugo" , value = "h.hello" , inline = False)
     embed.add_field(name = "Command to generate a random color" , value = "h.color" , inline = False)
     embed.add_field(name = "Command to generate random name" , value = "h.randomname ``number_of_names``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover(Curiosity) images as per sol" , value = "h.mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [curiosity , spirit , opportunity]``" , inline = False)
+    embed.add_field(name = "Command to get MARS rover images as per sol" , value = "h.mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [**c** for curiosity , **s** for spirit , **o** for opportunity]``" , inline = False)
     embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "h.apod" , inline = False)
     embed.add_field(name = "Command to get random number" , value = "h.randomnum or h.nrand ``lowerbound`` ``upperbound``" , inline = False)
     embed.add_field(name = "Command to get shoegaze avatar" , value = "h.shoegaze or h.sg" , inline = False)
-    embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi" , inline = False)
+    embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi ``url`` Add **-d** tag to get distorted version of the same" , inline = False)
+    embed.add_field(name = "Command to get a **Distorted** shoegaze filter on avatar" , value = "h.shoegazedistort or h.sgd" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -108,6 +102,7 @@ async def color(ctx):
     embed.add_field(name = "Color" , value = hex_number_string)
     embed.set_image(url = 'attachment://randcolor.png')
     await ctx.send(file = file , embed = embed) 
+    os.remove('randcolor.png')
 
 @client.command(aliases = ['rand'])
 async def randomname(ctx , *args):
@@ -188,14 +183,15 @@ async def randomnum(ctx , *args):
 
 @client.command(aliases = ['sg'])
 async def shoegaze(ctx , member :  discord.Member): 
-    im = randomizeImage(member.avatar_url)   
-    ext = 'png' 
+    ext = 'png'
+    im = Image.open(requests.get(member.avatar_url , stream = True).raw)
     if(im.format=='GIF'):
-        im.save('avatar.gif' , save_all = True)
-        ext = 'gif'
-    else:
-        im.save('avatar.png')
-    fil = discord.File('avatar.' + ext)
+        im.seek(0)
+    im = randomizeImage(im)   
+    buffer = BytesIO()
+    im.save(buffer , "png")
+    buffer.seek(0)
+    fil = discord.File(filename = 'avatar.' + ext , fp = buffer)
     embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
     embed.set_image(url = 'attachment://avatar.' + ext)  
     await ctx.send(file = fil , embed = embed) 
@@ -203,57 +199,77 @@ async def shoegaze(ctx , member :  discord.Member):
 @shoegaze.error
 async def shoegaze_err(ctx , err):
      if isinstance(err , commands.MissingRequiredArgument):
-        im = randomizeImage(ctx.message.author.avatar_url)    
-        im.save('avatar.png')
-        fil = discord.File('avatar.png')
+        im = Image.open(requests.get(ctx.message.author.avatar_url, stream = True).raw)
+        if(im.format=='GIF'):
+            im.seek(0)
+        im = randomizeImage(im)  
+        buffer = BytesIO()  
+        im.save(buffer , "png")
+        buffer.seek(0)
+        fil = discord.File(filename = 'avatar.png' , fp = buffer)
         embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
+        os.remove('avatar.png')
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
 
 @client.command(aliases = ['sgd'])
 async def shoegazedistort(ctx , member :  discord.Member): 
-    im = randomizeImage(member.avatar_url)   
+    im = Image.open(requests.get(member.avatar_url, stream = True).raw)
+    if(im.format=='GIF'):
+        im.seek(0)
+    im = randomizeImage(im)   
     im = distortImage(im)
     ext = 'png' 
-    if(im.format=='GIF'):
-        im.save('avatar.gif' , save_all = True)
-        ext = 'gif'
-    else:
-        im.save('avatar.png')
-    fil = discord.File('avatar.' + ext)
+    buffer = BytesIO()
+    im.save(buffer , "png")
+    buffer.seek(0)
+    fil = discord.File(filename = 'avatar.' + ext , fp = buffer)
     embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
     embed.set_image(url = 'attachment://avatar.' + ext)  
     await ctx.send(file = fil , embed = embed) 
+    os.remove('avatar.png')
              
 @shoegazedistort.error
 async def shoegazed_err(ctx , err):
      if isinstance(err , commands.MissingRequiredArgument):
-        im = randomizeImage(ctx.message.author.avatar_url)    
+        im = Image.open(requests.get(ctx.message.author.avatar_url, stream = True).raw)
+        if(im.format=='GIF'):
+            im.seek(0)
+        im = randomizeImage(im)    
         im = distortImage(im)
-        im.save('avatar.png')
-        fil = discord.File('avatar.png')
+        buffer = BytesIO()
+        im.save(buffer , "png")
+        fil = discord.File(filename = 'avatar.png' , fp = buffer)
+        buffer.seek(0)
         embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
+        os.remove('avatar.png')
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
 @client.command(aliases = ['sgi'])
 async def shoegazeimage(ctx , *args):
     #try: 
-        im = randomizeImage(args[0])
+        im = Image.open(requests.get(args[0], stream = True).raw)
+        if(im.format=='GIF'):
+            im.seek(0)
+        im = randomizeImage(im)
         addage = ""
         if(len(args)==2 and args[1]=='-d'):
             im = distortImage(im)
             addage = " with distortion"
-        im.save('avatar.png')
-        fil = discord.File('avatar.png')
+        buffer = BytesIO()
+        im.save(buffer , "png")
+        buffer.seek(0)
+        fil = discord.File(filename = 'avatar.png' , fp  = buffer)
         embed = discord.Embed(title = "Here is a shoegaze version of the image" + addage)
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
+        os.remove('avatar.png')
     #except:
     #   await ctx.send("invalid url :pensive:")
 client.run(TOKEN)
