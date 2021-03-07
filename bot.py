@@ -96,13 +96,13 @@ async def color(ctx):
         
     hex_int = int(hex_number_string[1:] , 16)
     im = Image.new("RGB" , (100 , 100) , hex_number_string)
-    im.save('randcolor.png')
-    file = discord.File('randcolor.png')
+    buffer = BytesIO()
+    im.save(buffer , "png")
+    file = discord.File(filename = 'randcolor.png' , fp = buffer)
     embed = discord.Embed(title = 'Random Color' , color = hex_int)
     embed.add_field(name = "Color" , value = hex_number_string)
     embed.set_image(url = 'attachment://randcolor.png')
     await ctx.send(file = file , embed = embed) 
-    os.remove('randcolor.png')
 
 @client.command(aliases = ['rand'])
 async def randomname(ctx , *args):
@@ -210,7 +210,7 @@ async def shoegaze_err(ctx , err):
         embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
-        os.remove('avatar.png')
+        
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
@@ -230,7 +230,6 @@ async def shoegazedistort(ctx , member :  discord.Member):
     embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
     embed.set_image(url = 'attachment://avatar.' + ext)  
     await ctx.send(file = fil , embed = embed) 
-    os.remove('avatar.png')
              
 @shoegazedistort.error
 async def shoegazed_err(ctx , err):
@@ -247,7 +246,6 @@ async def shoegazed_err(ctx , err):
         embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
-        os.remove('avatar.png')
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
@@ -269,7 +267,6 @@ async def shoegazeimage(ctx , *args):
         embed = discord.Embed(title = "Here is a shoegaze version of the image" + addage)
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
-        os.remove('avatar.png')
     #except:
     #   await ctx.send("invalid url :pensive:")
 client.run(TOKEN)
