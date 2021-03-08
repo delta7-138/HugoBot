@@ -1,4 +1,4 @@
 discord
 numpy
-dotenv
-PIL
+python-dotenv
+pillow
