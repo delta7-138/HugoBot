@@ -1,1 +1,1 @@
-worker: source env/bin/activate python bot.py
+worker: python bot.py
