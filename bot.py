@@ -13,7 +13,7 @@ from io import BytesIO
 
 load_dotenv()
 TOKEN = os.environ.get('DISCORD_TOKEN')
-API_TOKEN = os.environ.getss('API_TOKEN')
+API_TOKEN = os.environ.get('API_TOKEN')
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
