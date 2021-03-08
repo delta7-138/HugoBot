@@ -66,6 +66,7 @@ async def on_ready():
 async def on_message(message):
     if(message.content.startswith("Binod") and message.author.id != client.user.id):
         await message.channel.send("Binod")
+        await client.process_commands(message)
 
 
 @client.command()
