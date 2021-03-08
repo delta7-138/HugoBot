@@ -4,7 +4,6 @@ import random
 import requests
 import datetime as dt
 from math import *
-import numpy as np
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -65,7 +64,11 @@ def randomizeImage(im):
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
-    
+@client.event
+async def on_message(message):
+    if(message.content.startswith("Binod") and message.author.id != client.user.id):
+        await message.channel.send("Binod")
+
 
 @client.command()
 async def help(ctx):
@@ -98,6 +101,7 @@ async def color(ctx):
     im = Image.new("RGB" , (100 , 100) , hex_number_string)
     buffer = BytesIO()
     im.save(buffer , "png")
+    buffer.seek(0)
     file = discord.File(filename = 'randcolor.png' , fp = buffer)
     embed = discord.Embed(title = 'Random Color' , color = hex_int)
     embed.add_field(name = "Color" , value = hex_number_string)
