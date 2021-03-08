@@ -16,7 +16,7 @@ client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 
-def distortImage(im):
+async def distortImage(im):
     im = im.convert('RGB')
     pixels = im.load()
     for i in range(im.size[0]):
@@ -29,7 +29,7 @@ def distortImage(im):
                 im.putpixel((i , j) , tuple(tmp))    
     return im
 
-def randomGen(num):
+async def randomGen(num):
     val = (random.randint(1 , num))**2
     tmpvar = val
     ans = 0
@@ -39,7 +39,7 @@ def randomGen(num):
 
     return int(ans)
     
-def randomizeImage(im):
+async def randomizeImage(im):
     im = im.convert('RGB')
     pixels = im.load()
     xmax = im.size[0]
