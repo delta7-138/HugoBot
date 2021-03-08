@@ -5,15 +5,13 @@ import requests
 import datetime as dt
 from math import *
 
-from dotenv import load_dotenv
 from discord.ext import commands
 from PIL import Image
 from listofnames import first_names,last_names
 from io import BytesIO
 
-load_dotenv()
-TOKEN = os.environ.get('DISCORD_TOKEN')
-API_TOKEN = os.environ.get('API_TOKEN')
+TOKEN = os.environ['DISCORD_TOKEN']
+API_TOKEN = os.environ['API_TOKEN']
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
