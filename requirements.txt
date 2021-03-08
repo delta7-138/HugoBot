@@ -2,3 +2,5 @@ discord
 numpy
 python-dotenv
 pillow
+python
+virtualenv
