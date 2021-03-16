@@ -5,6 +5,7 @@ import requests
 import datetime as dt
 from math import *
 
+import json
 from discord.ext import commands
 from PIL import Image
 from listofnames import first_names,last_names
