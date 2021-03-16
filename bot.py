@@ -295,4 +295,24 @@ async def fmset(ctx , *args):
         json.dump(data, fp)
         await ctx.send("User successfully added")
 
+@client.command()
+async def fm(ctx):
+    userid = str(ctx.message.author.id)
+    if(userid not in data):
+        await ctx.send("Please set your last fm account first")
+    else:
+        fmuname = data[userid]
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+        content = json.loads(res.text)
+        track = content["track"][0]
+        trackartist = track["artist"]["#text"]
+        trackalbum = track["album"]["#text"]  
+        trackname = track["name"] 
+        trackimg = track["image"][3]["#text"]
+        embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
+        embed.add_field(name = trackname , inline = False)
+        embed.add_field(name = trackartist , inline = False)
+        embed.add_field(name = trackalbum , inline = False)
+        embed.set_image(url = trackimg)
+        await ctx.send(embed = embed)
 client.run(TOKEN)
