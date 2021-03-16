@@ -280,7 +280,7 @@ async def fmset(ctx , *args):
 
 
     for key, value in data.items(): 
-        if(value["user_id"]==userid or value["fmuname"]==fmuname):
+        if(key==userid or value==fmuname):
             await ctx.send("User is already there")
             return 0
         else:
@@ -290,10 +290,9 @@ async def fmset(ctx , *args):
                 await ctx.send("User not found :(")
                 return 0
 
-    lkeys = list(data.keys())
-    length = len(lkeys)
-    data[str(length + 1)] = {'user_id' : userid , 'fmuname' : fmuname}
+    data[userid] = fmuname
     with open('fm.json', 'w') as fp:
         json.dump(data, fp)
         await ctx.send("User successfully added")
+
 client.run(TOKEN)
