@@ -304,7 +304,7 @@ async def fm(ctx):
         fmuname = data[userid]
         res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
         content = json.loads(res.text)
-        track = content["track"][0]
+        track = content["recenttracks"]["track"][0]
         trackartist = track["artist"]["#text"]
         trackalbum = track["album"]["#text"]  
         trackname = track["name"] 
