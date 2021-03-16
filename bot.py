@@ -308,7 +308,7 @@ async def fm(ctx):
         trackartist = track["artist"]["#text"]
         trackalbum = track["album"]["#text"]  
         trackname = track["name"] 
-        trackimg = track["image"][3]["#text"]
+        trackimg = track["image"][2]["#text"]
         embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
         embed.add_field(name = "Track Name" , value = trackname  , inline = False)
         embed.add_field(name = "Artist Name" , value = trackartist , inline = False)
