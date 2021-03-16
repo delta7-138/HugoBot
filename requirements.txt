@@ -1,3 +1,4 @@
+json
 discord.py
 numpy
 python-dotenv
