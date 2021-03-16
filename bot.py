@@ -10,10 +10,16 @@ from discord.ext import commands
 from PIL import Image
 from listofnames import first_names,last_names
 from io import BytesIO
+import json
 
 load_dotenv()
+data = {}
+with open('fm.json') as f:
+    data = dict(json.load(f))
+
 TOKEN = os.getenv('DISCORD_TOKEN')
 API_TOKEN = os.getenv('API_TOKEN')
+LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
@@ -64,10 +70,6 @@ def randomizeImage(im):
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
-@client.event
-async def on_message(message):
-    if(message.content.startswith("Binod") and message.author.id != client.user.id):
-        await message.channel.send("Binod")
 
 
 @client.command()
@@ -273,4 +275,28 @@ async def shoegazeimage(ctx , *args):
         await ctx.send(file = fil , embed = embed) 
     #except:
     #   await ctx.send("invalid url :pensive:")
+
+@client.command()
+async def fmset(ctx , *args):
+    userid = str(ctx.message.author.id)
+    fmuname = args[0]
+
+
+    for key, value in data.items(): 
+        if(value["user_id"]==userid or value["fmuname"]==fmuname):
+            await ctx.send("User is already there")
+            return 0
+        else:
+            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
+            content = json.loads(res.text)
+            if("message" in content and content["message"]=="User not found"):
+                await ctx.send("User not found :(")
+                return 0
+
+    lkeys = list(data.keys())
+    length = len(lkeys)
+    data[str(length + 1)] = {'user_id' : userid , 'fmuname' : fmuname}
+    with open('fm.json', 'w') as fp:
+        json.dump(data, fp)
+        await ctx.send("User successfully added")
 client.run(TOKEN)
