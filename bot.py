@@ -345,9 +345,6 @@ async def fmw(ctx , *, args):
         memberID = str(member.id)
         if(memberID in data):
             uname = data[memberID]
-            nick = "" 
-            if(member.nick):   
-                nick = str(member.nick)
             nick = member.name
             unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
             parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -382,9 +379,6 @@ async def fmwerror(ctx , err):
             memberID = str(member.id)
             if(memberID in data):
                 uname = data[memberID]
-                nick = "" 
-                if(member.nick):   
-                    nick = str(member.nick)
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
