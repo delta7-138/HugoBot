@@ -375,6 +375,7 @@ async def fmwerror(ctx , err):
             fmuname = data[userid]
             res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
             content = json.loads(res.text)
+            track = content["recenttracks"]["track"][0]
             artist = track["artist"]["#text"]
 
         async for member in ctx.guild.fetch_members(limit = None):
