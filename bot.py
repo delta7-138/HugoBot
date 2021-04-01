@@ -12,7 +12,7 @@ from PIL import Image
 from listofnames import first_names,last_names
 from io import BytesIO
 
-data = {}
+
 
 TOKEN = os.environ['DISCORD_TOKEN']
 API_TOKEN = os.environ['API_TOKEN']
@@ -23,7 +23,7 @@ client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
 tmpdata = firebaseObj.get('/lastfm' , None)
-data = {}
+data = dict()
 
 for key,value in tmpdata.items(): 
      for subKey, subVal in value.items():
