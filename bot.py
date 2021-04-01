@@ -364,7 +364,7 @@ async def fmw(ctx , *, args):
 @fmw.error
 async def fmwerror(ctx , err):
     if isinstance(err , commands.MissingRequiredArgument):
-        artist = ""
+        artist = 
         userid = str(ctx.message.author.id)
         if(userid not in data):
             await ctx.send("Please set your last fm account first")
@@ -395,7 +395,7 @@ async def fmwerror(ctx , err):
         leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
         embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
         for key,value in leaderBoard:
-            embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u0020' , inline = False)
+            embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
         await ctx.send(embed = embed)
 
 @client.command(aliases = ['inv'])
