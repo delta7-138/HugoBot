@@ -364,6 +364,7 @@ async def fmw(ctx , *, args):
 @fmw.error
 async def fmwerror(ctx , err):
     if isinstance(err , commands.MissingRequiredArgument):
+        artist = ""
         userid = str(ctx.message.author.id)
         if(userid not in data):
             await ctx.send("Please set your last fm account first")
@@ -375,6 +376,8 @@ async def fmwerror(ctx , err):
             track = content["recenttracks"]["track"][0]
             artist = track["artist"]["#text"]
 
+        leaderBoard = dict()
+        image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
             if(memberID in data):
