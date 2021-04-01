@@ -364,7 +364,7 @@ async def fmw(ctx , *, args):
 @fmw.error
 async def fmwerror(ctx , err):
     if isinstance(err , commands.MissingRequiredArgument):
-        artist = 
+        artist = ""
         userid = str(ctx.message.author.id)
         if(userid not in data):
             await ctx.send("Please set your last fm account first")
