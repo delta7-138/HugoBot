@@ -286,7 +286,6 @@ async def shoegazeimage(ctx , *args):
 #FM COMMANDS
 @client.command(aliases = ['fmh'])
 async def fmhelp(ctx):
-    embed = Discord.embed()
     embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
     embed.add_field(name = "Command to set fm account" , value = "h.fmset" , inline = False)
     embed.add_field(name = "Command to see current track" , value = "h.fm" , inline = False)
