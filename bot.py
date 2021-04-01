@@ -88,6 +88,7 @@ async def help(ctx):
     embed.add_field(name = "Command to get shoegaze avatar" , value = "h.shoegaze or h.sg" , inline = False)
     embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi ``url`` Add **-d** tag to get distorted version of the same" , inline = False)
     embed.add_field(name = "Command to get a **Distorted** shoegaze filter on avatar" , value = "h.shoegazedistort or h.sgd" , inline = False)
+    embed.add_field(name = "To get Last fm help" , value = "h.fmhelp" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
@@ -279,6 +280,17 @@ async def shoegazeimage(ctx , *args):
         await ctx.send(file = fil , embed = embed) 
     #except:
     #   await ctx.send("invalid url :pensive:")
+
+#FM COMMANDS
+@client.command(aliases = ['fmh'])
+async def fmhelp(ctx):
+    embed = Discord.embed()
+    embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
+    embed.add_field(name = "Command to set fm account" , value = "h.fmset" , inline = False)
+    embed.add_field(name = "Command to see current track" , value = "h.fm" , inline = False)
+    embed.add_field(name = "Command to see who knows an artist" , value = "h.fmw `artist` or h.fmw" , inline = False)
+    await ctx.send(embed = embed)
+
 @client.command()
 async def fmset(ctx , *args):
     userid = str(ctx.message.author.id)
@@ -321,4 +333,42 @@ async def fm(ctx):
         embed.add_field(name = "Album Name", value = trackalbum , inline = False)
         embed.set_image(url = trackimg)
         await ctx.send(embed = embed)
+
+
+@client.command(aliases = ['fmwhoknows' , 'fmwk'])
+async def fmw(ctx , *, args):
+    artist = ""
+    if(args==None):
+        userid = str(ctx.message.author.id)
+        if(userid not in data):
+            await ctx.send("Please set your last fm account first")
+            return ;
+        else:
+            fmuname = data[userid]
+            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+            content = json.loads(res.text)
+            artist = track["artist"]["#text"]
+    artist = args
+    leaderBoard = dict()
+    image = ""
+    async for member in ctx.guild.fetch_members(limit = None):
+        memberID = str(member.id)
+        if(memberID in data):
+            uname = data[memberID]    
+            nick = str(member.nick)
+            unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            parsedURL = urllib.parse.urlencode(unparsedURL)
+            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
+            content = json.loads(res2.text)
+            playCount = content['artist']['stats']['userplaycount']
+            image = content['artist']['image'][1]['#text']
+            if(playCount!='0'):
+                leaderBoard[nick] = int(playCount)
+        
+    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+    for key,value in leaderBoard:
+        embed.add_field(name = key, value = value , inline = False)
+    await ctx.send(embed = embed)
+
 client.run(TOKEN)
