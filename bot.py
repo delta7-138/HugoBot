@@ -337,16 +337,16 @@ async def fm(ctx):
 @client.command(aliases = ['fmwhoknows' , 'fmwk'])
 async def fmw(ctx , *, args):
     artist = ""
-    if(args==None):
-        userid = str(ctx.message.author.id)
-        if(userid not in data):
-            await ctx.send("Please set your last fm account first")
-            return ;
-        else:
-            fmuname = data[userid]
-            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
-            content = json.loads(res.text)
-            artist = track["artist"]["#text"]
+    # if(args==None):
+    #     userid = str(ctx.message.author.id)
+    #     if(userid not in data):
+    #         await ctx.send("Please set your last fm account first")
+    #         return ;
+    #     else:
+    #         fmuname = data[userid]
+    #         res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+    #         content = json.loads(res.text)
+    #         artist = track["artist"]["#text"]
     artist = args
     leaderBoard = dict()
     image = ""
