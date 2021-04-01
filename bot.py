@@ -368,14 +368,14 @@ async def fmw(ctx , *, args):
 async def fmwerror(ctx , err):
     if isinstance(err , commands.MissingRequiredArgument):
         userid = str(ctx.message.author.id)
-         if(userid not in data):
-             await ctx.send("Please set your last fm account first")
-             return ;
-         else:
-             fmuname = data[userid]
-             res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
-             content = json.loads(res.text)
-             artist = track["artist"]["#text"]
+        if(userid not in data):
+            await ctx.send("Please set your last fm account first")
+            return ;
+        else:
+            fmuname = data[userid]
+            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+            content = json.loads(res.text)
+            artist = track["artist"]["#text"]
         async for member in ctx.guild.fetch_members(limit = None):
         memberID = str(member.id)
         if(memberID in data):
@@ -398,7 +398,7 @@ async def fmwerror(ctx , err):
     for key,value in leaderBoard:
         embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
     await ctx.send(embed = embed)
-    
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
