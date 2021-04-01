@@ -11,6 +11,7 @@ from discord.ext import commands
 from PIL import Image
 from listofnames import first_names,last_names
 from io import BytesIO
+import urllib.parse
 import json
 
 load_dotenv()
@@ -310,6 +311,29 @@ async def fmset(ctx , *args):
     print(result)
     await ctx.send("User successfully added")
 
-@client.command(aliases = ['fmw'])
-async def fmwhoknows(ctx , *args):
+@client.command()
+async def fmw(ctx , *, args):
+    artist = args
+    leaderBoard = dict()
+    image = ""
+    async for member in ctx.guild.fetch_members(limit = None):
+        memberID = str(member.id)
+        if(memberID in data):
+            uname = data[memberID]    
+            nick = str(member.nick)
+            unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            parsedURL = urllib.parse.urlencode(unparsedURL)
+            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
+            content = json.loads(res2.text)
+            playCount = content['artist']['stats']['userplaycount']
+            image = content['artist']['image'][1]['#text']
+            if(playCount!='0'):
+                leaderBoard[nick] = int(playCount)
+        
+    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+    for key,value in leaderBoard:
+        embed.add_field(name = key, value = value , inline = False)
+    await ctx.send(embed = embed)
+
 client.run(TOKEN)
