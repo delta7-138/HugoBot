@@ -17,7 +17,10 @@ TOKEN = os.environ['DISCORD_TOKEN']
 API_TOKEN = os.environ['API_TOKEN']
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
-client = commands.Bot(command_prefix = 'h.')
+
+intents = discord.Intents.default()
+intents.members = True
+client = commands.Bot(command_prefix = 'h.' , intents = intents)
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
