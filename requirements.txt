@@ -5,4 +5,3 @@ pillow
 virtualenv
 requests
 git+https://github.com/ozgur/python-firebase
-urllib.parse
