@@ -395,7 +395,7 @@ async def fmwerror(ctx , err):
         leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
         embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
         for key,value in leaderBoard:
-            embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+            embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u0020' , inline = False)
         await ctx.send(embed = embed)
 
 @client.command(aliases = ['inv'])
