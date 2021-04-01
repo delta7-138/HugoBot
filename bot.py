@@ -263,6 +263,8 @@ async def shoegazed_err(ctx , err):
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
+
+        
 @client.command(aliases = ['sgi'])
 async def shoegazeimage(ctx , *args):
     #try: 
@@ -307,4 +309,7 @@ async def fmset(ctx , *args):
     result = firebaseObj.post('/lastfm' , tmp)
     print(result)
     await ctx.send("User successfully added")
+
+@client.command(aliases = ['fmw'])
+async def fmwhoknows(ctx , *args):
 client.run(TOKEN)
