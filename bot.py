@@ -373,4 +373,7 @@ async def fmw(ctx , *, args):
         embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
     await ctx.send(embed = embed)
 
+@client.command(aliases = ['inv'])
+async def invite(ctx):
+    await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
 client.run(TOKEN)
