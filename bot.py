@@ -3,6 +3,7 @@ import os
 import random
 import requests
 import datetime as dt
+from firebase import firebase 
 from math import *
 
 from dotenv import load_dotenv
@@ -13,16 +14,23 @@ from io import BytesIO
 import json
 
 load_dotenv()
-data = {}
-with open('fm.json') as f:
-    data = dict(json.load(f))
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
+FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
+firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
+tmpdata = firebaseObj.get('/lastfm' , None)
+data = {}
+
+for key,value in tmpdata.items(): 
+     for subKey, subVal in value.items():
+         data[subKey] = subVal
+
+print(data)
 
 def distortImage(im):
     im = im.convert('RGB')
@@ -283,20 +291,20 @@ async def fmset(ctx , *args):
 
 
     for key, value in data.items(): 
-        if(value["user_id"]==userid or value["fmuname"]==fmuname):
-            await ctx.send("User is already there")
-            return 0
-        else:
-            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
-            content = json.loads(res.text)
-            if("message" in content and content["message"]=="User not found"):
-                await ctx.send("User not found :(")
-                return 0
+          if(value["user_id"]==userid or value["fmuname"]==fmuname):
+              await ctx.send("User is already there")
+              return 0
+          else:
+              res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
+              content = json.loads(res.text)
+              if("message" in content and content["message"]=="User not found"):
+                  await ctx.send("User not found :(")
+                  return 0
 
     lkeys = list(data.keys())
     length = len(lkeys)
-    data[str(length + 1)] = {'user_id' : userid , 'fmuname' : fmuname}
-    with open('fm.json', 'w') as fp:
-        json.dump(data, fp)
-        await ctx.send("User successfully added")
+    tmp = {userid : fmuname}
+    result = firebaseObj.post('/lastfm' , tmp)
+    print(result)
+    await ctx.send("User successfully added")
 client.run(TOKEN)
