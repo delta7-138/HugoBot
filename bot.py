@@ -13,8 +13,6 @@ from listofnames import first_names,last_names
 from io import BytesIO
 
 data = {}
-with open('fm.json') as f:
-    data = dict(json.load(f))
 
 TOKEN = os.environ['DISCORD_TOKEN']
 API_TOKEN = os.environ['API_TOKEN']
