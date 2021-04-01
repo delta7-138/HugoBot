@@ -4,3 +4,4 @@ python-dotenv
 pillow
 virtualenv
 requests
+git+https://github.com/ozgur/python-firebase

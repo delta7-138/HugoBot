@@ -29,7 +29,8 @@ first_names = ['Aashu',
     'Hanumantha Rao', 
     'Harbhajan', 
     'Harikrishna', 
-    'Harsh Vardhan']
+    'Harsh Vardhan'
+    'Vishal']
     
 last_names = [ 
     'Mohanty',

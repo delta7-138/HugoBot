@@ -4,6 +4,7 @@ import random
 import requests
 import datetime as dt
 from math import *
+from firebase import firebase
 
 import json
 from discord.ext import commands
@@ -18,10 +19,17 @@ with open('fm.json') as f:
 TOKEN = os.environ['DISCORD_TOKEN']
 API_TOKEN = os.environ['API_TOKEN']
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
-
+FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
+firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
+tmpdata = firebaseObj.get('/lastfm' , None)
+data = {}
+
+for key,value in tmpdata.items(): 
+     for subKey, subVal in value.items():
+         data[subKey] = subVal
 
 def distortImage(im):
     im = im.convert('RGB')
@@ -291,9 +299,9 @@ async def fmset(ctx , *args):
                 return 0
 
     data[userid] = fmuname
-    with open('fm.json', 'w') as fp:
-        json.dump(data, fp)
-        await ctx.send("User successfully added")
+    tmp = {userid , fmuname}
+    firebaseObj.post('/lastfm' , tmp)
+    await ctx.send("User successfully added :vampire:")
 
 @client.command()
 async def fm(ctx):
