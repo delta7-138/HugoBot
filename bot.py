@@ -11,8 +11,7 @@ from discord.ext import commands
 from PIL import Image
 from listofnames import first_names,last_names
 from io import BytesIO
-
-
+import urllib.parse
 
 TOKEN = os.environ['DISCORD_TOKEN']
 API_TOKEN = os.environ['API_TOKEN']
