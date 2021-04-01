@@ -376,28 +376,29 @@ async def fmwerror(ctx , err):
             res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
             content = json.loads(res.text)
             artist = track["artist"]["#text"]
+
         async for member in ctx.guild.fetch_members(limit = None):
-        memberID = str(member.id)
-        if(memberID in data):
-            uname = data[memberID]
-            nick = "" 
-            if(member.nick):   
-                nick = str(member.nick)
-            nick = member.name
-            unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-            parsedURL = urllib.parse.urlencode(unparsedURL)
-            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
-            content = json.loads(res2.text)
-            playCount = content['artist']['stats']['userplaycount']
-            image = content['artist']['image'][1]['#text']
-            if(playCount!='0'):
-                leaderBoard[nick] = int(playCount)
+            memberID = str(member.id)
+            if(memberID in data):
+                uname = data[memberID]
+                nick = "" 
+                if(member.nick):   
+                    nick = str(member.nick)
+                nick = member.name
+                unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+                parsedURL = urllib.parse.urlencode(unparsedURL)
+                res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
+                content = json.loads(res2.text)
+                playCount = content['artist']['stats']['userplaycount']
+                image = content['artist']['image'][1]['#text']
+                if(playCount!='0'):
+                    leaderBoard[nick] = int(playCount)
         
-    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
-    for key,value in leaderBoard:
-        embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
-    await ctx.send(embed = embed)
+        leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+        embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+        for key,value in leaderBoard:
+            embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+        await ctx.send(embed = embed)
 
 @client.command(aliases = ['inv'])
 async def invite(ctx):
