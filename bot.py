@@ -370,7 +370,7 @@ async def fmw(ctx , *, args):
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
     embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
     for key,value in leaderBoard:
-        embed.add_field(name = key, value = value , inline = True)
+        embed.add_field(name = key + '-' + '**' + str(value) + '** plays' , value = ' ' , inline = False)
     await ctx.send(embed = embed)
 
 client.run(TOKEN)
