@@ -297,7 +297,7 @@ async def fmset(ctx , *args):
                 return 0
 
     data[userid] = fmuname
-    tmp = {userid , fmuname}
+    tmp = {userid : fmuname}
     firebaseObj.post('/lastfm' , tmp)
     await ctx.send("User successfully added :vampire:")
 
