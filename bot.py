@@ -515,7 +515,7 @@ async def fmwhoknowstrack(ctx , * , args):
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
             content = json.loads(res2.text)
             playCount = content['track']['userplaycount']
-            image = content['track']['image'][2]['#text']
+            image = content['track']["album"]['image'][2]['#text']
             if(playCount!='0'):
                 leaderBoard[nick] = int(playCount)
         
@@ -557,7 +557,7 @@ async def fmwhoknowstrackerr(ctx , err):
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
             content = json.loads(res2.text)
             playCount = content['track']['userplaycount']
-            image = content['track']['image'][2]['#text']
+            image = content['track']['album']['image'][2]['#text']
             if(playCount!='0'):
                 leaderBoard[nick] = int(playCount)
         
@@ -569,7 +569,7 @@ async def fmwhoknowstrackerr(ctx , err):
         embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
     embed.set_image(url = image)
     await ctx.send(embed = embed) 
-    
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
