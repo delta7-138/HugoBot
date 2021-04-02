@@ -520,7 +520,7 @@ async def fmwhoknowstrack(ctx , * , args):
                 leaderBoard[nick] = int(playCount)
         
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + track + '**' , color=0x00ffea)
     ctr = 0
     for key,value in leaderBoard:
         ctr+=1
@@ -562,7 +562,7 @@ async def fmwhoknowstrackerr(ctx , err):
                 leaderBoard[nick] = int(playCount)
         
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + track + '**' , color=0x00ffea)
     ctr = 0
     for key,value in leaderBoard:
         ctr+=1
