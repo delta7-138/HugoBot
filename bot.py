@@ -379,8 +379,10 @@ async def fmw(ctx , *, args):
         
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
     embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+    ctr = 0
     for key,value in leaderBoard:
-        embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+        ctr+=1
+        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
     await ctx.send(embed = embed)
 
 @fmw.error
@@ -416,8 +418,10 @@ async def fmwerror(ctx , err):
         
         leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
         embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+        ctr = 0
         for key,value in leaderBoard:
-            embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+            ctr+=1
+            embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
         await ctx.send(embed = embed)
 
 @client.command(aliases = ['fmwka' , 'fmwa'])
@@ -438,17 +442,21 @@ async def fmwhoknowsalbum(ctx , * , args):
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
             content = json.loads(res2.text)
             playCount = content['album']['userplaycount']
+            image = content['album']['image'][2]['#text']
             if(playCount!='0'):
                 leaderBoard[nick] = int(playCount)
         
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
     embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    ctr = 0
     for key,value in leaderBoard:
-        embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+        ctr+=1
+        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)4
+    embed.set_image(url = image)
     await ctx.send(embed = embed) 
 
 @fmwhoknowsalbum.error
-async def fmwhoknowserr(ctx , err):
+async def fmwhoknowsalbumerr(ctx , err):
     if isinstance(err , commands.MissingRequiredArgument):
         artist = ""
         album = ""
@@ -476,13 +484,17 @@ async def fmwhoknowserr(ctx , err):
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
             content = json.loads(res2.text)
             playCount = content['album']['userplaycount']
+            image = content['album']['image'][2]['#text']
             if(playCount!='0'):
                 leaderBoard[nick] = int(playCount)
         
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
     embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    ctr = 0
     for key,value in leaderBoard:
-        embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+        ctr+=1
+        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+    embed.set_image(url = image)
     await ctx.send(embed = embed) 
 
 
