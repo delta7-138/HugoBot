@@ -451,7 +451,7 @@ async def fmwhoknowsalbum(ctx , * , args):
     ctr = 0
     for key,value in leaderBoard:
         ctr+=1
-        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)4
+        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
     embed.set_image(url = image)
     await ctx.send(embed = embed) 
 
