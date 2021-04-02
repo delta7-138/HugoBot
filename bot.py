@@ -95,7 +95,7 @@ async def help(ctx):
 
 @client.command()
 async def hello(ctx): 
-    await ctx.send(f'Hello There!')
+    await ctx.send(f'Hello There {}!'.format(ctx.message.author.mention()))
 
 @client.command()
 async def color(ctx):
@@ -116,6 +116,27 @@ async def color(ctx):
     embed.add_field(name = "Color" , value = hex_number_string)
     embed.set_image(url = 'attachment://randcolor.png')
     await ctx.send(file = file , embed = embed) 
+
+@client.command(aliases = ['genc' , 'gencol' , 'gc'])
+async def gencolor(ctx , * , args):
+    hex_number_string = args.upper()
+    hex_int = 0
+    if(len(hex_number_string)!=7):
+        await ctx.send("invalid hex :rage:")
+        return ;
+    try:
+        hex_int = int(hex_number_string[1:] , 16)
+        im = Image.new("RGB" , (100 , 100) , hex_number_string)
+        buffer = BytesIO()
+        im.save(buffer , "png")
+        buffer.seek(0)
+        file = discord.File(filename = 'color.png' , fp = buffer)
+        embed = discord.Embed(title = 'Color' , color = hex_int)
+        embed.add_field(name = "Color" , value = hex_number_string)
+        embed.set_image(url = 'attachment://color.png')
+        await ctx.send(file = file , embed = embed) 
+    except:
+        await ctx.send("invalid hex :rage:")
 
 @client.command(aliases = ['rand'])
 async def randomname(ctx , *args):
@@ -262,6 +283,7 @@ async def shoegazed_err(ctx , err):
 
      if isinstance(err , commands.BadArgument):
          await ctx.send('Dude atleast tag a valid member :unamused:')
+
 @client.command(aliases = ['sgi'])
 async def shoegazeimage(ctx , *args):
     #try: 
@@ -397,6 +419,74 @@ async def fmwerror(ctx , err):
         for key,value in leaderBoard:
             embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
         await ctx.send(embed = embed)
+
+@client.command(aliases = ['fmwka' , 'fmwa'])
+async def fmwhoknowsalbum(ctx , * , args):
+    artistAlbum = args.split("-")
+    artistAlbum = [i.strip() for i in artistAlbum]
+    album = artistAlbum[1]
+    artist = artistAlbum[0]
+    leaderBoard = dict()
+    image = ""
+    async for member in ctx.guild.fetch_members(limit = None):
+        memberID = str(member.id)
+        if(memberID in data):
+            uname = data[memberID]
+            nick = member.name
+            unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            parsedURL = urllib.parse.urlencode(unparsedURL)
+            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
+            content = json.loads(res2.text)
+            playCount = content['album']['userplaycount']
+            image = content['artist']['image'][1]['#text']
+            if(playCount!='0'):
+                leaderBoard[nick] = int(playCount)
+        
+    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    for key,value in leaderBoard:
+        embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+    await ctx.send(embed = embed) 
+
+@fmwhoknowsalbum.error
+async def fmwhoknowserr(ctx , err):
+    if isinstance(err , commands.MissingRequiredArgument):
+        artist = ""
+        album = ""
+        userid = str(ctx.message.author.id)
+        if(userid not in data):
+            await ctx.send("Please set your last fm account first")
+            return ;
+        else:
+            fmuname = data[userid]
+            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+            content = json.loads(res.text)
+            track = content["recenttracks"]["track"][0]
+            artist = track["artist"]["#text"]
+            album = track["album"]["#text"]
+    
+    leaderBoard = dict()
+    image = ""
+    async for member in ctx.guild.fetch_members(limit = None):
+        memberID = str(member.id)
+        if(memberID in data):
+            uname = data[memberID]
+            nick = member.name
+            unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            parsedURL = urllib.parse.urlencode(unparsedURL)
+            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
+            content = json.loads(res2.text)
+            playCount = content['album']['userplaycount']
+            image = content['artist']['image'][1]['#text']
+            if(playCount!='0'):
+                leaderBoard[nick] = int(playCount)
+        
+    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    for key,value in leaderBoard:
+        embed.add_field(name = key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+    await ctx.send(embed = embed) 
+
 
 @client.command(aliases = ['inv'])
 async def invite(ctx):
