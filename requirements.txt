@@ -1,5 +1,6 @@
 discord.py
 numpy
+matplotlib
 python-dotenv
 pillow
 virtualenv

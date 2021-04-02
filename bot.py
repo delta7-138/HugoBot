@@ -12,6 +12,9 @@ from PIL import Image
 from listofnames import first_names,last_names
 from io import BytesIO
 import urllib.parse
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 
 TOKEN = os.environ['DISCORD_TOKEN']
 API_TOKEN = os.environ['API_TOKEN']
@@ -380,12 +383,31 @@ async def fmw(ctx , *, args):
                 leaderBoard[nick] = int(playCount)
         
     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
-    ctr = 0
-    for key,value in leaderBoard:
-        ctr+=1
-        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
-    await ctx.send(embed = embed)
+    labels = []
+    values = []
+    for x,y in leaderBoard:
+        labels.append(x)
+        values.append(y)
+
+    x = np.arange(len(labels))
+    width = 0.35
+    fig, ax = plt.subplots()
+    rects1 = ax.bar(x - width/4, values, width, label='Men')
+    ax.set_ylabel('Play Count for ' + artist)
+    ax.set_title('Who knows ' + artist)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.bar_label(rects1, padding=3)
+    fig.tight_layout()
+    buffer = BytesIO()
+    plt.savefig(buffer , format = "png")
+    buffer.seek(0)
+    plt.close()
+    fil = discord.File(filename = 'whoknows.png' , fp = buffer)
+    # embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+    # for key,value in leaderBoard:
+    #     embed.add_field(name = key, value = value , inline = False)
+    await ctx.send(file = fil)
 
 @fmw.error
 async def fmwerror(ctx , err):
@@ -419,12 +441,31 @@ async def fmwerror(ctx , err):
                     leaderBoard[nick] = int(playCount)
         
         leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-        embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
-        ctr = 0
-        for key,value in leaderBoard:
-            ctr+=1
-            embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
-        await ctx.send(embed = embed)
+        labels = []
+        values = []
+        for x,y in leaderBoard:
+            labels.append(x)
+            values.append(y)
+
+        x = np.arange(len(labels))
+        width = 0.35
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width/4, values, width, label='Men')
+        ax.set_ylabel('Play Count for ' + artist)
+        ax.set_title('Who knows ' + artist)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
+        ax.bar_label(rects1, padding=3)
+        fig.tight_layout()
+        buffer = BytesIO()
+        plt.savefig(buffer , format = "png")
+        buffer.seek(0)
+        plt.close()
+        fil = discord.File(filename = 'whoknows.png' , fp = buffer)
+        # embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+        # for key,value in leaderBoard:
+        #     embed.add_field(name = key, value = value , inline = False)
+        await ctx.send(file = fil)
 
 @client.command(aliases = ['fmwka' , 'fmwa'])
 async def fmwhoknowsalbum(ctx , * , args):
