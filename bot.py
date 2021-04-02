@@ -497,7 +497,79 @@ async def fmwhoknowsalbumerr(ctx , err):
     embed.set_image(url = image)
     await ctx.send(embed = embed) 
 
+@client.command(aliases = ['fmwt' , 'fmwkt'])
+async def fmwhoknowstrack(ctx , * , args):
+    artistTrack = args.split("-")
+    artistTrack = [i.strip() for i in artistAlbum]
+    album = artistTrack[1]
+    artist = artistTrack[0]
+    leaderBoard = dict()
+    image = ""
+    async for member in ctx.guild.fetch_members(limit = None):
+        memberID = str(member.id)
+        if(memberID in data):
+            uname = data[memberID]
+            nick = member.name
+            unparsedURL = {'artist' : artist , 'track' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            parsedURL = urllib.parse.urlencode(unparsedURL)
+            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
+            content = json.loads(res2.text)
+            playCount = content['track']['userplaycount']
+            image = content['track']['image'][2]['#text']
+            if(playCount!='0'):
+                leaderBoard[nick] = int(playCount)
+        
+    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    ctr = 0
+    for key,value in leaderBoard:
+        ctr+=1
+        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+    embed.set_image(url = image)
+    await ctx.send(embed = embed) 
 
+@fmwhoknowstrack.error
+async def fmwhoknowstrackerr(ctx , err):
+    if isinstance(err , commands.MissingRequiredArgument):
+        artist = ""
+        track= ""
+        userid = str(ctx.message.author.id)
+        if(userid not in data):
+            await ctx.send("Please set your last fm account first")
+            return ;
+        else:
+            fmuname = data[userid]
+            res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+            content = json.loads(res.text)
+            trackitem = content["recenttracks"]["track"][0]
+            artist = trackitem["artist"]["#text"]
+            track = trackitem["name"]
+    
+    leaderBoard = dict()
+    image = ""
+    async for member in ctx.guild.fetch_members(limit = None):
+        memberID = str(member.id)
+        if(memberID in data):
+            uname = data[memberID]
+            nick = member.name
+            unparsedURL = {'artist' : artist , 'track' : track , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            parsedURL = urllib.parse.urlencode(unparsedURL)
+            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
+            content = json.loads(res2.text)
+            playCount = content['track']['userplaycount']
+            image = content['track']['image'][2]['#text']
+            if(playCount!='0'):
+                leaderBoard[nick] = int(playCount)
+        
+    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    embed = discord.Embed(title = 'WHO KNOWS **' + artist + '** - ' + '**' + album + '**' , color=0x00ffea)
+    ctr = 0
+    for key,value in leaderBoard:
+        ctr+=1
+        embed.add_field(name = str(ctr) + '. ' + key + '  -  ' + '**' + str(value) + '** plays' , value = '\u200b' , inline = False)
+    embed.set_image(url = image)
+    await ctx.send(embed = embed) 
+    
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
