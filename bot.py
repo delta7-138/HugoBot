@@ -95,7 +95,7 @@ async def help(ctx):
 
 @client.command()
 async def hello(ctx): 
-    await ctx.send(f'Hello There {}!'.format(ctx.message.author.mention()))
+    await ctx.send('Hello There {}!'.format(ctx.message.author.mention()))
 
 @client.command()
 async def color(ctx):
