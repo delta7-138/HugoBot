@@ -578,7 +578,7 @@ async def advice(ctx):
     content = json.loads(res.text)
     adviceMsg = content["slip"]["advice"]
     embed = discord.Embed(title = "Advice" , description = "for stupid people" , color = 0x00ffea)
-    embed.add_field(name = "Advice" value = adviceMsg)
+    embed.add_field(name = "Advice" ,  value = adviceMsg)
     embed.set_thumbnail(url = 'https://bloximages.newyork1.vip.townnews.com/omaha.com/content/tncms/assets/v3/editorial/e/84/e845347d-fc1d-53a8-9775-f2f1df4ec42a/5e98d4681f24c.image.jpg?resize=1200%2C1200')
     await ctx.send(embed = embed)
 
