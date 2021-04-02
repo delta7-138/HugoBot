@@ -582,6 +582,19 @@ async def advice(ctx):
     embed.set_thumbnail(url = 'https://bloximages.newyork1.vip.townnews.com/omaha.com/content/tncms/assets/v3/editorial/e/84/e845347d-fc1d-53a8-9775-f2f1df4ec42a/5e98d4681f24c.image.jpg?resize=1200%2C1200')
     await ctx.send(embed = embed)
 
+@client.command(aliases = ['aniq'])
+async def animequote(ctx):
+    res = requests.get('https://animechan.vercel.app/api/random')
+    content =json.loads(res.text)
+    quote = content["quote"]
+    character = content["character"]
+    anime = content["anime"]
+    embed = discord.Embed(title = "Anime Quote" , color = 0x00ffea)
+    embed.add_field(name = "Quote" , value = "*" + quote + "*" , inline = False)
+    embed.add_field(name = "By" , value = character , inline = False)
+    embed.add_field(name = "From", value = anime , inline = False)
+    await ctx.send(embed = embed)
+    
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
