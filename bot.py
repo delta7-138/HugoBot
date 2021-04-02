@@ -572,6 +572,16 @@ async def fmwhoknowstrackerr(ctx , err):
     embed.set_image(url = image)
     await ctx.send(embed = embed) 
 
+@client.command(aliases = ['adv'])
+async def advice(ctx):
+    res = requests.get('https://api.adviceslip.com/advice')
+    content = json.loads(res.text)
+    adviceMsg = content["slip"]["advice"]
+    embed = discord.Embed(title = "Advice" , description = "for stupid people" , color = 0x00ffea)
+    embed.add_field(name = "Advice" value = adviceMsg)
+    embed.set_thumbnail(url = 'https://bloximages.newyork1.vip.townnews.com/omaha.com/content/tncms/assets/v3/editorial/e/84/e845347d-fc1d-53a8-9775-f2f1df4ec42a/5e98d4681f24c.image.jpg?resize=1200%2C1200')
+    await ctx.send(embed = embed)
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
