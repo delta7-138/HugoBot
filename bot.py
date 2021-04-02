@@ -311,7 +311,9 @@ async def fmhelp(ctx):
     embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
     embed.add_field(name = "Command to set fm account" , value = "h.fmset" , inline = False)
     embed.add_field(name = "Command to see current track" , value = "h.fm" , inline = False)
-    embed.add_field(name = "Command to see who knows an artist" , value = "h.fmw `artist` or h.fmw" , inline = False)
+    embed.add_field(name = "Command to see who knows an artist" , value = "h.fmw `artist` or h.fmw aliases = h.fmwhoknows" , inline = False)
+    embed.add_field(name = "Command to see who knows an album" , value = "h.fmwka `<artist> - <albumname>`(aliases = h.fmwa , h.fmwhoknowsalbum) " , inline = False)
+    embed.add_field(name = "Command to see who knows a track" , value = "h.fmwkt `<artist> - <trackname>` (aliases = h.fmwt , h.fmwhoknowstrack)" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
