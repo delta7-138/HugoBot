@@ -634,7 +634,7 @@ async def animequote(ctx):
     quote = content["quote"]
     character = content["character"]
     anime = content["anime"]
-    embed = discord.Embed(title = "Anime Quote" , description = '*' + quote + '*' color = 0x00ffea)
+    embed = discord.Embed(title = "Anime Quote" , description = '*' + quote + '*'  , color = 0x00ffea)
     embed.set_footer(text = 'by - **' + character + '**\n from - **' + anime + '**' )
     await ctx.send(embed = embed)
     
