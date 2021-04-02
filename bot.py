@@ -438,7 +438,6 @@ async def fmwhoknowsalbum(ctx , * , args):
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
             content = json.loads(res2.text)
             playCount = content['album']['userplaycount']
-            image = content['artist']['image'][1]['#text']
             if(playCount!='0'):
                 leaderBoard[nick] = int(playCount)
         
@@ -477,7 +476,6 @@ async def fmwhoknowserr(ctx , err):
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
             content = json.loads(res2.text)
             playCount = content['album']['userplaycount']
-            image = content['artist']['image'][1]['#text']
             if(playCount!='0'):
                 leaderBoard[nick] = int(playCount)
         
