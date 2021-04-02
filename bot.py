@@ -500,8 +500,8 @@ async def fmwhoknowsalbumerr(ctx , err):
 @client.command(aliases = ['fmwt' , 'fmwkt'])
 async def fmwhoknowstrack(ctx , * , args):
     artistTrack = args.split("-")
-    artistTrack = [i.strip() for i in artistAlbum]
-    album = artistTrack[1]
+    artistTrack = [i.strip() for i in artistTrack]
+    track = artistTrack[1]
     artist = artistTrack[0]
     leaderBoard = dict()
     image = ""
@@ -510,7 +510,7 @@ async def fmwhoknowstrack(ctx , * , args):
         if(memberID in data):
             uname = data[memberID]
             nick = member.name
-            unparsedURL = {'artist' : artist , 'track' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+            unparsedURL = {'artist' : artist , 'track' : track, 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
             parsedURL = urllib.parse.urlencode(unparsedURL)
             res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
             content = json.loads(res2.text)
