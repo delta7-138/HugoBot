@@ -636,6 +636,7 @@ async def animequote(ctx):
     anime = content["anime"]
     embed = discord.Embed(title = "Anime Quote" , description = '*' + quote + '*'  , color = 0x00ffea)
     embed.set_footer(text = 'by - ' + character + '\n from - ' + anime)
+    embed.set_thumbnail(url = 'https://i.pinimg.com/474x/89/08/61/8908616ffb91db2dbd1b640a374a1ee2.jpg')
     await ctx.send(embed = embed)
     
 @client.command(aliases = ['inv'])
