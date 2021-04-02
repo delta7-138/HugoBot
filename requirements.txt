@@ -1,8 +1,8 @@
 discord.py
 numpy
+matplotlib
 python-dotenv
 pillow
 virtualenv
 requests
 git+https://github.com/ozgur/python-firebase
-git+https://github.com/matplotlib/matplotlib
