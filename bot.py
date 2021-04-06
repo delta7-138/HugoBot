@@ -99,7 +99,7 @@ async def help(ctx):
     await ctx.send(embed = embed)
 
 @client.command(aliases = ['ch'])
-async def h.colorhelp(ctx):
+async def colorhelp(ctx):
     embed = discord.Embed(title = 'Hugo Color Help' , color = 0x00ffea)
     embed.add_field(name = "Random color" , value = "h.color aliases(h.col)")
     embed.add_field(name = "Generate color with hex code" , value = "h.genc `hexcode` aliases(h.gencolor)")
