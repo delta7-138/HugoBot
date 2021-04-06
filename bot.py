@@ -697,7 +697,8 @@ async def standardofliving(ctx , * , args):
         res3 = requests.get(nextnextUrl)
         content3 = json.loads(res3.text)
         city_score = content3['teleport_city_score']
-        embed = discord.Embed(name = 'Teleport City Summary' , description = "**Teleport City Score  : " + str(city_score) + "**" , color = 0x00ffea)
+        embed = discord.Embed(name = 'Teleport City Summary for ' + args.upper(), color = 0x00ffea)
+        embed.add_field(name = 'Teleport City Score' , value = str(city_score) , inline = False)
         categories = content3['categories']
         flip = True
         ctr = 1
