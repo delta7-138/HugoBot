@@ -98,6 +98,15 @@ async def help(ctx):
     embed.set_footer(text = "requested by a busta")
     await ctx.send(embed = embed)
 
+@client.command(aliases = ['ah'])
+async def astrohelp(ctx):
+    embed = discord.Embed(title = 'Hugo Astronomy Help' , color = 0x00ffea)
+    embed.add_field(name = "Astronomy picture of the day" , value = "h.apod" , inline = False)
+    embed.add_field(name = "Mars Rover images" , value = "h.mars <sol number> <camera_type> <rover name as in c for curiosity , o for opportunity and s for spirit>" , inline = False)
+    embed.set_footer(text = "requested by a busta")
+    embed.set_thumbnail(url = 'https://i.insider.com/502292d36bb3f76241000009?width=1100&format=jpeg&auto=webp')
+    await ctx.send(embed = embed)
+    
 @client.command(aliases = ['ch'])
 async def colorhelp(ctx):
     embed = discord.Embed(title = 'Hugo Color Help' , color = 0x00ffea)
