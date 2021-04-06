@@ -647,7 +647,7 @@ async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
 
 @client.command()
-aynsc def count(ctx):
+async def count(ctx):
     serverCount = len(list(client.guilds))
     await ctx.send('I am lurking around in ' + serverCount + 'servers')
 client.run(TOKEN)
