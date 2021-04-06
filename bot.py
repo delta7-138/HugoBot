@@ -685,25 +685,34 @@ async def urmomiserror(ctx , err):
 
 @client.command(aliases = ['sol'])
 async def standardofliving(ctx , * , args):
-    queryCity = urllib.parse.urlencode(args)
-    res1 = requests.get('https://api.teleport.org/api/cities/?search=' + queryCity)
-    content1 = json.loads(res1)
-    nextUrl = content1['_embedded']['city:search:results'][0]['_links']['city:item']['href']
+    queryCity = urllib.parse.urlencode({'search' : args})
+    res1 = requests.get('https://api.teleport.org/api/cities/?' + queryCity)
+    content1 = json.loads(res1.text)
+    nextUrl = content1['_embedded']['city:search-results'][0]['_links']['city:item']['href']
+
     if(nextUrl):
         res2 = requests.get(nextUrl)
-        content2 = json.loads(res2)
-        nextnextUrl = content2['_links']['city:urban_area']['href']
+        content2 = json.loads(res2.text)
+        nextnextUrl = content2['_links']['city:urban_area']['href'] + 'scores'
         res3 = requests.get(nextnextUrl)
-        content3 = requests.get(res3)
-        city_score = content3['teleportscore']
-        embed = discord.Embed(name = 'Teleport City Summary' , color = 0x00ffea)
+        content3 = json.loads(res3.text)
+        city_score = content3['teleport_city_score']
+        embed = discord.Embed(name = 'Teleport City Summary' , description = "**Teleport City Score  : " + str(city_score) + "**" , color = 0x00ffea)
         categories = content3['categories']
-        print(categories)
+        flip = False
+        ctr = 1
         for i in content3['categories']:
-            embed.add_field(name = i['name'] , value = i['score_out_of_10'])
+            if(ctr%3==0):
+                flip = True
+            else:
+                flip = False
 
-        embed.set_footer('data provided by Teleport api')
-        embed.set_thumbnail('https://www.plantemoran.com/-/media/images/insights-images/2018/04/thinking-about-becoming-a-smart-city.jpg?h=704&w=1100&la=en&hash=0F4F54BBECD3E501765A064202A24F8851D74E04')
+            ctr+=1
+            embed.add_field(name = i['name'] , value = i['score_out_of_10'] , inline = flip)
+
+        embed.set_footer(text = 'data provided by Teleport api')
+        embed.set_thumbnail(url = 'https://www.plantemoran.com/-/media/images/insights-images/2018/04/thinking-about-becoming-a-smart-city.jpg?h=704&w=1100&la=en&hash=0F4F54BBECD3E501765A064202A24F8851D74E04')
+        await ctx.send(embed = embed)
     else:
         await ctx.send('invalid input :pensive:')
 
