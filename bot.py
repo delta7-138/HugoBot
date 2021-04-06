@@ -650,7 +650,7 @@ async def advice(ctx):
     content = json.loads(res.text)
     adviceMsg = content["slip"]["advice"]
     embed = discord.Embed(title = "Advice for stupid people" , description = adviceMsg , color = 0x00ffea)
-    embed.set_thumbnail(url = 'https://bloximages.newyork1.vip.townnews.com/omaha.com/content/tncms/assets/v3/editorial/e/84/e845347d-fc1d-53a8-9775-f2f1df4ec42a/5e98d4681f24c.image.jpg?resize=1200%2C1200')
+    embed.set_thumbnail(url = 'https://i0.wp.com/www.brainpickings.org/wp-content/uploads/2014/10/nietzsche1.jpg?w=680&ssl=1')
     embed.set_footer(text = 'requested by ' + uname)
     await ctx.send(embed = embed)
 
