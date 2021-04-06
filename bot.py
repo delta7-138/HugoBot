@@ -688,7 +688,7 @@ async def standardofliving(ctx , * , args):
     queryCity = urllib.parse.urlencode(args)
     res1 = requests.get('https://api.teleport.org/api/cities/?search=' + queryCity)
     content1 = json.loads(res1)
-    nextUrl = content1['_embedded']['city:search:results'][0]['_links']['city:item'])['href']
+    nextUrl = content1['_embedded']['city:search:results'][0]['_links']['city:item']['href']
     if(nextUrl):
         res2 = requests.get(nextUrl)
         content2 = json.loads(res2)
