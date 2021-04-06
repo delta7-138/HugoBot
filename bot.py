@@ -699,13 +699,13 @@ async def standardofliving(ctx , * , args):
         city_score = content3['teleport_city_score']
         embed = discord.Embed(name = 'Teleport City Summary' , description = "**Teleport City Score  : " + str(city_score) + "**" , color = 0x00ffea)
         categories = content3['categories']
-        flip = False
+        flip = True
         ctr = 1
         for i in content3['categories']:
             if(ctr%3==0):
-                flip = True
-            else:
                 flip = False
+            else:
+                flip = True
 
             ctr+=1
             embed.add_field(name = i['name'] , value = i['score_out_of_10'] , inline = flip)
