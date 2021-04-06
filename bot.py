@@ -86,11 +86,11 @@ async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
     embed.add_field(name = "Color commands help" , value = "h.colorhelp or h.ch" , inline = True)
     embed.add_field(name = "Command to generate random name" , value = "h.randomname ``number_of_names``" , inline = True)
-    embed.add_field(name = "Command to get random number" , value = "h.randomnum or h.nrand ``lowerbound`` ``upperbound``" , inline = False)
-    embed.add_field(name = "Astronomy commands help" , value = "h.astrohelp or h.ah"  , inline = True)
+    embed.add_field(name = "Command to get random number" , value = "h.randomnum or h.nrand ``lowerbound`` ``upperbound``" , inline = True)
+    embed.add_field(name = "Astronomy commands help" , value = "h.astrohelp or h.ah"  , inline = False)
     embed.add_field(name = "Command to get shoegaze avatar" , value = "h.shoegaze or h.sg" , inline = True)
     embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi ``url`` Add **-d** tag to get distorted version of the same" , inline = True)
-    embed.add_field(name = "Command to get a **Distorted** shoegaze filter on avatar" , value = "h.shoegazedistort or h.sgd" , inline = False)
+    embed.add_field(name = "Command to get a **Distorted** shoegaze filter on avatar" , value = "h.shoegazedistort or h.sgd" , inline = True)
     embed.add_field(name = "To get Last fm help" , value = "h.fmhelp" , inline = False)
     embed.add_field(name = "To get advice" , value = "h.adv" , inline = True)
     embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = True)
@@ -241,6 +241,7 @@ async def randomnum(ctx , *args):
         await ctx.send('Please send valid input :pleading_face:')
 
 @client.command(aliases = ['sg'])
+@commands.cooldown(1, 30, commands.BucketType.user)
 async def shoegaze(ctx , member :  discord.Member): 
     ext = 'png'
     im = Image.open(requests.get(member.avatar_url , stream = True).raw)
@@ -275,6 +276,7 @@ async def shoegaze_err(ctx , err):
          await ctx.send('Dude atleast tag a valid member :unamused:')
 
 @client.command(aliases = ['sgd'])
+@commands.cooldown(1, 30, commands.BucketType.user)
 async def shoegazedistort(ctx , member :  discord.Member): 
     im = Image.open(requests.get(member.avatar_url, stream = True).raw)
     if(im.format=='GIF'):
@@ -310,6 +312,7 @@ async def shoegazed_err(ctx , err):
          await ctx.send('Dude atleast tag a valid member :unamused:')
 
 @client.command(aliases = ['sgi'])
+@commands.cooldown(1, 30, commands.BucketType.user)
 async def shoegazeimage(ctx , *args):
     #try: 
         im = Image.open(requests.get(args[0], stream = True).raw)
