@@ -649,5 +649,5 @@ async def invite(ctx):
 @client.command()
 async def count(ctx):
     serverCount = len(list(client.guilds))
-    await ctx.send('I am lurking around in ' + serverCount + 'servers')
+    await ctx.send('I am lurking around in ' + str(serverCount) + 'servers')
 client.run(TOKEN)
