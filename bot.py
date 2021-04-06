@@ -665,7 +665,15 @@ async def animequote(ctx):
     embed.set_footer(text = 'by - ' + character + '\n from - ' + anime)
     embed.set_thumbnail(url = 'https://i.pinimg.com/474x/89/08/61/8908616ffb91db2dbd1b640a374a1ee2.jpg')
     await ctx.send(embed = embed)
-    
+
+@client.command()
+async def urmom(ctx , member : discord.Member):
+    res = requests.get('https://api.yomomma.info/')
+    content = json.loads(res.text)
+    joke = content["joke"]
+    mention = member.mention
+    await ctx.send(mention + " " + joke)
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
