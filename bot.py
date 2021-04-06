@@ -94,6 +94,7 @@ async def help(ctx):
     embed.add_field(name = "To get Last fm help" , value = "h.fmhelp" , inline = False)
     embed.add_field(name = "To get advice" , value = "h.adv" , inline = True)
     embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = True)
+    embed.add_field(name = "To get Teleport City Summary" , value = "h.standardofliving <city name> aliases = h.sol" , inline = False)
     embed.set_thumbnail(url = thumb)
     embed.set_footer(text = "requested by a busta")
     await ctx.send(embed = embed)
@@ -691,29 +692,32 @@ async def standardofliving(ctx , * , args):
     nextUrl = content1['_embedded']['city:search-results'][0]['_links']['city:item']['href']
 
     if(nextUrl):
-        res2 = requests.get(nextUrl)
-        content2 = json.loads(res2.text)
-        nextnextUrl = content2['_links']['city:urban_area']['href'] + 'scores'
-        res3 = requests.get(nextnextUrl)
-        content3 = json.loads(res3.text)
-        city_score = content3['teleport_city_score']
-        embed = discord.Embed(title = 'Teleport City Summary for ' + args.upper(), color = 0x00ffea)
-        embed.add_field(name = 'Teleport City Score' , value = str(city_score) , inline = False)
-        categories = content3['categories']
-        flip = True
-        ctr = 1
-        for i in content3['categories']:
-            if(ctr%3==0):
-                flip = False
-            else:
-                flip = True
+        try:
+            res2 = requests.get(nextUrl)
+            content2 = json.loads(res2.text)
+            nextnextUrl = content2['_links']['city:urban_area']['href'] + 'scores'
+            res3 = requests.get(nextnextUrl)
+            content3 = json.loads(res3.text)
+            city_score = content3['teleport_city_score']
+            embed = discord.Embed(title = 'Teleport City Summary for ' + args.upper(), color = 0x00ffea)
+            embed.add_field(name = 'Teleport City Score' , value = str(city_score) , inline = False)
+            categories = content3['categories']
+            flip = True
+            ctr = 1
+            for i in content3['categories']:
+                if(ctr%3==0):
+                    flip = False
+                else:
+                    flip = True
 
-            ctr+=1
-            embed.add_field(name = i['name'] , value = i['score_out_of_10'] , inline = flip)
+                ctr+=1
+                embed.add_field(name = i['name'] , value = i['score_out_of_10'] , inline = flip)
 
-        embed.set_footer(text = 'data provided by Teleport api')
-        embed.set_thumbnail(url = 'https://www.plantemoran.com/-/media/images/insights-images/2018/04/thinking-about-becoming-a-smart-city.jpg?h=704&w=1100&la=en&hash=0F4F54BBECD3E501765A064202A24F8851D74E04')
-        await ctx.send(embed = embed)
+            embed.set_footer(text = 'data provided by Teleport api')
+            embed.set_thumbnail(url = 'https://www.plantemoran.com/-/media/images/insights-images/2018/04/thinking-about-becoming-a-smart-city.jpg?h=704&w=1100&la=en&hash=0F4F54BBECD3E501765A064202A24F8851D74E04')
+            await ctx.send(embed = embed)
+        except: 
+            await ctx.send("City not available :pensive: :v:")
     else:
         await ctx.send('invalid input :pensive:')
 
