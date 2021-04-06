@@ -106,7 +106,7 @@ async def astrohelp(ctx):
     embed.set_footer(text = "requested by a busta")
     embed.set_thumbnail(url = 'https://i.insider.com/502292d36bb3f76241000009?width=1100&format=jpeg&auto=webp')
     await ctx.send(embed = embed)
-    
+
 @client.command(aliases = ['ch'])
 async def colorhelp(ctx):
     embed = discord.Embed(title = 'Hugo Color Help' , color = 0x00ffea)
@@ -381,6 +381,7 @@ async def fm(ctx):
         trackalbum = track["album"]["#text"]  
         trackname = track["name"] 
         trackimg = track["image"][2]["#text"]
+        print(trackname + " " + trackalbum + " " + trackartist)
         embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
         embed.add_field(name = "Track Name" , value = trackname  , inline = False)
         embed.add_field(name = "Artist Name" , value = trackartist , inline = False)
