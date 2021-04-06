@@ -94,6 +94,8 @@ async def help(ctx):
     embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi ``url`` Add **-d** tag to get distorted version of the same" , inline = False)
     embed.add_field(name = "Command to get a **Distorted** shoegaze filter on avatar" , value = "h.shoegazedistort or h.sgd" , inline = False)
     embed.add_field(name = "To get Last fm help" , value = "h.fmhelp" , inline = False)
+    embed.add_field(name = "To get advice" , value = "h.adv" , inline = False)
+    embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = False)
     await ctx.send(embed = embed)
 
 @client.command()
