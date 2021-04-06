@@ -674,6 +674,15 @@ async def urmom(ctx , member : discord.Member):
     mention = member.mention
     await ctx.send(mention + " " + joke)
 
+@urmom.error
+async def urmomiserror(ctx , err):
+    if isinstance(err , commands.MissingRequiredArgument):
+        res = requests.get('https://api.yomomma.info/')
+        content = json.loads(res.text)
+        joke = content["joke"]
+        mention = ctx.message.author.mention
+        await ctx.send(mention + " " + joke)
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
