@@ -697,6 +697,8 @@ async def standardofliving(ctx , * , args):
         content3 = requests.get(res3)
         city_score = content3['teleportscore']
         embed = discord.Embed(name = 'Teleport City Summary' , color = 0x00ffea)
+        categories = content3['categories']
+        print(categories)
         for i in content3['categories']:
             embed.add_field(name = i['name'] , value = i['score_out_of_10'])
 
