@@ -104,7 +104,7 @@ async def colorhelp(ctx):
     embed.add_field(name = "Random color" , value = "h.color aliases(h.col)")
     embed.add_field(name = "Generate color with hex code" , value = "h.genc `hexcode` aliases(h.gencolor)")
     embed.set_thumbnail(url = thumb)
-    embed.set_footer('requested by a busta')
+    embed.set_footer(text = 'requested by a busta')
     await ctx.send(embed = embed)
 
 @client.command(aliases = ['fmh'])
@@ -116,7 +116,7 @@ async def fmhelp(ctx):
     embed.add_field(name = "Command to see who knows an album" , value = "h.fmwka `<artist> - <albumname>`(aliases = h.fmwa , h.fmwhoknowsalbum) " , inline = False)
     embed.add_field(name = "Command to see who knows a track" , value = "h.fmwkt `<artist> - <trackname>` (aliases = h.fmwt , h.fmwhoknowstrack)" , inline = False)
     embed.set_thumbnail(url = 'https://lh3.googleusercontent.com/proxy/BzW7U-yNC8RjUf2SWOEzDcRxlCjXZBx7RGjiGu7QdDm7g4aKHC3tE815KW-cyut1yBF-qOKhR0r5i919Fa2nPnYqITbp-bg4Rqs_dxE8b976G3bi9SMUIC88Qkw8RIOphMD7rrIsggvBzwtcZdwTSvqVVM-vzhdeQtc')
-    embed.set_footer('requested by a busta')
+    embed.set_footer(text = 'requested by a busta')
     await ctx.send(embed = embed)
 
 @client.command(aliases = ['col'])
