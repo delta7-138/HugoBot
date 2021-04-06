@@ -29,7 +29,7 @@ modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
 tmpdata = firebaseObj.get('/lastfm' , None)
 data = dict()
-
+thumb = 'https://promomsclub.com/wp-content/uploads/2019/02/help-153094_1280.png'
 for key,value in tmpdata.items(): 
      for subKey, subVal in value.items():
          data[subKey] = subVal
@@ -80,29 +80,46 @@ def randomizeImage(im):
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
-
+#help commands
 @client.command()
 async def help(ctx):
     embed = discord.Embed(title = 'Hugo Help' , color=0x00ffea)
-    embed.add_field(name = "Command to greet Hugo" , value = "h.hello" , inline = False)
-    embed.add_field(name = "Command to generate a random color" , value = "h.color" , inline = False)
-    embed.add_field(name = "Command to generate random name" , value = "h.randomname ``number_of_names``" , inline = False)
-    embed.add_field(name = "Command to get MARS rover images as per sol" , value = "h.mars ``sol_number`` ``cameratype in [fhaz , rhaz , chemcam, mast ,mahli, mardi, navcam]`` ``rover_name as in [**c** for curiosity , **s** for spirit , **o** for opportunity]``" , inline = False)
-    embed.add_field(name = "Command to get Astronomy picture of the Day" , value = "h.apod" , inline = False)
+    embed.add_field(name = "Color commands help" , value = "h.colorhelp or h.ch" , inline = True)
+    embed.add_field(name = "Command to generate random name" , value = "h.randomname ``number_of_names``" , inline = True)
     embed.add_field(name = "Command to get random number" , value = "h.randomnum or h.nrand ``lowerbound`` ``upperbound``" , inline = False)
-    embed.add_field(name = "Command to get shoegaze avatar" , value = "h.shoegaze or h.sg" , inline = False)
-    embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi ``url`` Add **-d** tag to get distorted version of the same" , inline = False)
+    embed.add_field(name = "Astronomy commands help" , value = "h.astrohelp or h.ah"  , inline = True)
+    embed.add_field(name = "Command to get shoegaze avatar" , value = "h.shoegaze or h.sg" , inline = True)
+    embed.add_field(name = "Command to get shoegaze filter on an image" , value = "h.shoegazeimage or h.sgi ``url`` Add **-d** tag to get distorted version of the same" , inline = True)
     embed.add_field(name = "Command to get a **Distorted** shoegaze filter on avatar" , value = "h.shoegazedistort or h.sgd" , inline = False)
     embed.add_field(name = "To get Last fm help" , value = "h.fmhelp" , inline = False)
-    embed.add_field(name = "To get advice" , value = "h.adv" , inline = False)
-    embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = False)
+    embed.add_field(name = "To get advice" , value = "h.adv" , inline = True)
+    embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = True)
+    embed.set_thumb(thumb)
+    embed.set_footer(text = "requested by a busta")
     await ctx.send(embed = embed)
 
-@client.command()
-async def hello(ctx): 
-    await ctx.send('Hello There {}!'.format(ctx.message.author.mention()))
+@client.command(aliases = ['ch'])
+async def h.colorhelp(ctx):
+    embed = discord.Embed(title = 'Hugo Color Help' , color = 0x00ffea)
+    embed.add_field(name = "Random color" , value = "h.color aliases(h.col)")
+    embed.add_field(name = "Generate color with hex code" , value = "h.genc `hexcode` aliases(h.gencolor)")
+    embed.set_thumbnail(thumb)
+    embed.set_footer('requested by a busta')
+    await ctx.send(embed = embed)
 
-@client.command()
+@client.command(aliases = ['fmh'])
+async def fmhelp(ctx):
+    embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
+    embed.add_field(name = "Command to set fm account" , value = "h.fmset" , inline = False)
+    embed.add_field(name = "Command to see current track" , value = "h.fm" , inline = False)
+    embed.add_field(name = "Command to see who knows an artist" , value = "h.fmw `artist` or h.fmw aliases = h.fmwhoknows" , inline = False)
+    embed.add_field(name = "Command to see who knows an album" , value = "h.fmwka `<artist> - <albumname>`(aliases = h.fmwa , h.fmwhoknowsalbum) " , inline = False)
+    embed.add_field(name = "Command to see who knows a track" , value = "h.fmwkt `<artist> - <trackname>` (aliases = h.fmwt , h.fmwhoknowstrack)" , inline = False)
+    embed.set_thumbnail('https://lh3.googleusercontent.com/proxy/BzW7U-yNC8RjUf2SWOEzDcRxlCjXZBx7RGjiGu7QdDm7g4aKHC3tE815KW-cyut1yBF-qOKhR0r5i919Fa2nPnYqITbp-bg4Rqs_dxE8b976G3bi9SMUIC88Qkw8RIOphMD7rrIsggvBzwtcZdwTSvqVVM-vzhdeQtc')
+    embed.set_footer('requested by a busta')
+    await ctx.send(embed = embed)
+
+@client.command(aliases = ['col'])
 async def color(ctx):
     hex_number_string = '#'
     for i in range(6):
@@ -314,15 +331,7 @@ async def shoegazeimage(ctx , *args):
     #   await ctx.send("invalid url :pensive:")
 
 #FM COMMANDS
-@client.command(aliases = ['fmh'])
-async def fmhelp(ctx):
-    embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
-    embed.add_field(name = "Command to set fm account" , value = "h.fmset" , inline = False)
-    embed.add_field(name = "Command to see current track" , value = "h.fm" , inline = False)
-    embed.add_field(name = "Command to see who knows an artist" , value = "h.fmw `artist` or h.fmw aliases = h.fmwhoknows" , inline = False)
-    embed.add_field(name = "Command to see who knows an album" , value = "h.fmwka `<artist> - <albumname>`(aliases = h.fmwa , h.fmwhoknowsalbum) " , inline = False)
-    embed.add_field(name = "Command to see who knows a track" , value = "h.fmwkt `<artist> - <trackname>` (aliases = h.fmwt , h.fmwhoknowstrack)" , inline = False)
-    await ctx.send(embed = embed)
+
 
 @client.command()
 async def fmset(ctx , *args):
@@ -651,5 +660,5 @@ async def invite(ctx):
 @client.command()
 async def count(ctx):
     serverCount = len(list(client.guilds))
-    await ctx.send('I am lurking around in ' + str(serverCount) + 'servers')
+    await ctx.send('I am lurking around in ' + str(serverCount) + ' servers')
 client.run(TOKEN)
