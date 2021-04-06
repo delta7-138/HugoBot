@@ -195,13 +195,16 @@ async def mars(ctx , *args):
 
 @client.command()
 async def apod(ctx):
-    gres = requests.get('https://api.nasa.gov/planetary/apod?api_key=' + API_TOKEN)
-    gdata = gres.json()
-    embed = discord.Embed(title = 'Astronomy Picture Of the Day' , color = 0x0000ff)
-    embed.add_field(name = 'Date' , value = gdata['date'])
-    # embed.add_field(name = gdata['title'] , value = gdata['explanation'])
-    embed.set_image(url = gdata['hdurl'])
-    await ctx.send(embed = embed)
+    try: 
+        gres = requests.get('https://api.nasa.gov/planetary/apod?api_key=' + API_TOKEN)
+        gdata = gres.json()
+        embed = discord.Embed(title = 'Astronomy Picture Of the Day' , color = 0x0000ff)
+        embed.add_field(name = 'Date' , value = gdata['date'])
+        # embed.add_field(name = gdata['title'] , value = gdata['explanation'])
+        embed.set_image(url = gdata['hdurl'])
+        await ctx.send(embed = embed)
+    except: 
+        await ctx.send('Error in sending picture :pensive:')
 
 @client.command(aliases = ['nrand'])
 async def randomnum(ctx , *args):
@@ -642,4 +645,9 @@ async def animequote(ctx):
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
+
+@client.command()
+aynsc def count(ctx):
+    serverCount = len(list(client.guilds))
+    await ctx.send('I am lurking around in ' + serverCount + 'servers')
 client.run(TOKEN)
