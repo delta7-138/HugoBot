@@ -94,7 +94,7 @@ async def help(ctx):
     embed.add_field(name = "To get Last fm help" , value = "h.fmhelp" , inline = False)
     embed.add_field(name = "To get advice" , value = "h.adv" , inline = True)
     embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = True)
-    embed.set_thumb(thumb)
+    embed.set_thumbnail(thumb)
     embed.set_footer(text = "requested by a busta")
     await ctx.send(embed = embed)
 
