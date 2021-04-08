@@ -78,7 +78,7 @@ async def randomizeImage(im):
 
 @client.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name="my life"))
+    await client.change_presence(activity=discord.Game(name="my life"))
     print('We have logged in as {0.user}'.format(client))
 
 #help commands
