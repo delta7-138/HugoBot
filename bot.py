@@ -860,7 +860,7 @@ async def thispersondoesnotexist(ctx):
     im = Image.open(requests.get('https://thispersondoesnotexist.com/image', stream = True).raw)
     buffer = BytesIO()
     im.save(buffer , "png")
-    fil = discord.File(name = "ne.png" , fp = buffer)
+    fil = discord.File(filename = "ne.png" , fp = buffer)
     buffer.seek(0)
     await ctx.send(file = fil)
 
