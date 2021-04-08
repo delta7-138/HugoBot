@@ -850,7 +850,7 @@ async def covidcountry(ctx , *args):
         plt.close()
         fil = discord.File(filename = 'cvc.png' , fp = buffer)
         embed = discord.Embed(title = "Summary for " + country.upper() , color = 0xff0000)
-        embed.set_footer('data provided by https://covid-api.mmediagroup.fr/v1/')
+        embed.set_footer(text = 'data provided by https://covid-api.mmediagroup.fr/v1/')
         await ctx.send(file = fil)
     except:
         await ctx.send("Invalid Country name :rage:")
