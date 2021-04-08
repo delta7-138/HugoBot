@@ -251,7 +251,7 @@ async def randomnum(ctx , *args):
         await ctx.send('Please send valid input :pleading_face:')
 
 @client.command(aliases = ['sg'])
-@commands.cooldown(1, 30, commands.BucketType.user)
+#@commands.cooldown(1, 30, commands.BucketType.user)
 async def shoegaze(ctx , member :  discord.Member): 
     ext = 'png'
     im = Image.open(requests.get(member.avatar_url , stream = True).raw)
@@ -286,7 +286,7 @@ async def shoegaze_err(ctx , err):
          await ctx.send('Dude atleast tag a valid member :unamused:')
 
 @client.command(aliases = ['sgd'])
-@commands.cooldown(1, 30, commands.BucketType.user)
+#@commands.cooldown(1, 30, commands.BucketType.user)
 async def shoegazedistort(ctx , member :  discord.Member): 
     im = Image.open(requests.get(member.avatar_url, stream = True).raw)
     if(im.format=='GIF'):
@@ -322,9 +322,9 @@ async def shoegazed_err(ctx , err):
          await ctx.send('Dude atleast tag a valid member :unamused:')
 
 @client.command(aliases = ['sgi'])
-@commands.cooldown(1, 30, commands.BucketType.user)
+#@commands.cooldown(1, 30, commands.BucketType.user)
 async def shoegazeimage(ctx , *args):
-    #try: 
+    try: 
         im = Image.open(requests.get(args[0], stream = True).raw)
         if(im.format=='GIF'):
             im.seek(0)
@@ -340,8 +340,8 @@ async def shoegazeimage(ctx , *args):
         embed = discord.Embed(title = "Here is a shoegaze version of the image" + addage)
         embed.set_image(url = 'attachment://avatar.png')  
         await ctx.send(file = fil , embed = embed) 
-    #except:
-    #   await ctx.send("invalid url :pensive:")
+    except:
+        await ctx.send("invalid url :pensive:")
 
 #FM COMMANDS
 
