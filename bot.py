@@ -796,6 +796,7 @@ async def covidcountry(ctx , *args):
     for i in range(len(args)-1):
         country = country + " " + args[i]
     
+    print(country)
     country = country.strip()
     param = ""
     try:
@@ -862,7 +863,7 @@ async def invite(ctx):
         name = member.nick
     embed = discord.Embed(title = "Invite to HugoBot" , color = 0xff00ea , url = 'https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
     embed.set_thumbnail(url = 'https://images-ext-1.discordapp.net/external/KP2KA04tKe-XdJlC9tEKDmbUml0irWvC60-3dHNoDsA/%3Fsize%3D1024/https/cdn.discordapp.com/avatars/785077511758675988/d5d96bcb287f37c6351c5378870fcce2.webp?width=595&height=595')
-    embed.set_footer('requested by ' + name)
+    embed.set_footer(text = 'requested by ' + name)
     await ctx.send(embed = embed)
 
 @client.command()
