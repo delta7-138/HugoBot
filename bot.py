@@ -857,8 +857,13 @@ async def covidcountry(ctx , *args):
 
 @client.command(aliases = ['tpdne' , 'ne'])
 async def thispersondoesnotexist(ctx):
-    res = requests.get('https://thispersondoesnotexist.com/image')
-    print(res.text)
+    im = Image.open(requests.get('thispersondoesnotexist.com/image', stream = True).raw)
+    buffer = BytesIO()
+    im.save(buffer , "png")
+    fil = discord.File(name = "ne.png" , fp = buffer)
+    buffer.seek(0)
+    await ctx.send(file = fil)
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     member = ctx.message.author
