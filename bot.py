@@ -857,7 +857,7 @@ async def covidcountry(ctx , *args):
 
 @client.command(aliases = ['tpdne' , 'ne'])
 async def thispersondoesnotexist(ctx):
-    im = Image.open(requests.get('thispersondoesnotexist.com/image', stream = True).raw)
+    im = Image.open(requests.get('https://thispersondoesnotexist.com/image', stream = True).raw)
     buffer = BytesIO()
     im.save(buffer , "png")
     fil = discord.File(name = "ne.png" , fp = buffer)
