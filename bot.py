@@ -855,6 +855,10 @@ async def covidcountry(ctx , *args):
     except:
         await ctx.send("Invalid Country name :rage:")
 
+@client.command(aliases = ['tpdne' , 'ne'])
+async def thispersondoesnotexist(ctx):
+    await ctx.send('https://thispersondoesnotexist.com/image')
+
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     member = ctx.message.author
