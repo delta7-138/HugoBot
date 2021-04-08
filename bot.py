@@ -250,98 +250,98 @@ async def randomnum(ctx , *args):
     except:
         await ctx.send('Please send valid input :pleading_face:')
 
-# @client.command(aliases = ['sg'])
-# @commands.cooldown(1, 30, commands.BucketType.user)
-# async def shoegaze(ctx , member :  discord.Member): 
-#     ext = 'png'
-#     im = Image.open(requests.get(member.avatar_url , stream = True).raw)
-#     if(im.format=='GIF'):
-#         im.seek(0)
-#     im = randomizeImage(im)   
-#     buffer = BytesIO()
-#     im.save(buffer , "png")
-#     buffer.seek(0)
-#     fil = discord.File(filename = 'avatar.' + ext , fp = buffer)
-#     embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
-#     embed.set_image(url = 'attachment://avatar.' + ext)  
-#     await ctx.send(file = fil , embed = embed) 
+@client.command(aliases = ['sg'])
+@commands.cooldown(1, 30, commands.BucketType.user)
+async def shoegaze(ctx , member :  discord.Member): 
+    ext = 'png'
+    im = Image.open(requests.get(member.avatar_url , stream = True).raw)
+    if(im.format=='GIF'):
+        im.seek(0)
+    im = randomizeImage(im)   
+    buffer = BytesIO()
+    im.save(buffer , "png")
+    buffer.seek(0)
+    fil = discord.File(filename = 'avatar.' + ext , fp = buffer)
+    embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
+    embed.set_image(url = 'attachment://avatar.' + ext)  
+    await ctx.send(file = fil , embed = embed) 
              
-# @shoegaze.error
-# async def shoegaze_err(ctx , err):
-#      if isinstance(err , commands.MissingRequiredArgument):
-#         im = Image.open(requests.get(ctx.message.author.avatar_url, stream = True).raw)
-#         if(im.format=='GIF'):
-#             im.seek(0)
-#         im = randomizeImage(im)  
-#         buffer = BytesIO()  
-#         im.save(buffer , "png")
-#         buffer.seek(0)
-#         fil = discord.File(filename = 'avatar.png' , fp = buffer)
-#         embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
-#         embed.set_image(url = 'attachment://avatar.png')  
-#         await ctx.send(file = fil , embed = embed) 
+@shoegaze.error
+async def shoegaze_err(ctx , err):
+     if isinstance(err , commands.MissingRequiredArgument):
+        im = Image.open(requests.get(ctx.message.author.avatar_url, stream = True).raw)
+        if(im.format=='GIF'):
+            im.seek(0)
+        im = randomizeImage(im)  
+        buffer = BytesIO()  
+        im.save(buffer , "png")
+        buffer.seek(0)
+        fil = discord.File(filename = 'avatar.png' , fp = buffer)
+        embed = discord.Embed(title = "Here is a shoegaze version of the avatar")
+        embed.set_image(url = 'attachment://avatar.png')  
+        await ctx.send(file = fil , embed = embed) 
         
 
-#      if isinstance(err , commands.BadArgument):
-#          await ctx.send('Dude atleast tag a valid member :unamused:')
+     if isinstance(err , commands.BadArgument):
+         await ctx.send('Dude atleast tag a valid member :unamused:')
 
-# @client.command(aliases = ['sgd'])
-# @commands.cooldown(1, 30, commands.BucketType.user)
-# async def shoegazedistort(ctx , member :  discord.Member): 
-#     im = Image.open(requests.get(member.avatar_url, stream = True).raw)
-#     if(im.format=='GIF'):
-#         im.seek(0)
-#     im = randomizeImage(im)   
-#     im = distortImage(im)
-#     ext = 'png' 
-#     buffer = BytesIO()
-#     im.save(buffer , "png")
-#     buffer.seek(0)
-#     fil = discord.File(filename = 'avatar.' + ext , fp = buffer)
-#     embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
-#     embed.set_image(url = 'attachment://avatar.' + ext)  
-#     await ctx.send(file = fil , embed = embed) 
+@client.command(aliases = ['sgd'])
+@commands.cooldown(1, 30, commands.BucketType.user)
+async def shoegazedistort(ctx , member :  discord.Member): 
+    im = Image.open(requests.get(member.avatar_url, stream = True).raw)
+    if(im.format=='GIF'):
+        im.seek(0)
+    im = randomizeImage(im)   
+    im = distortImage(im)
+    ext = 'png' 
+    buffer = BytesIO()
+    im.save(buffer , "png")
+    buffer.seek(0)
+    fil = discord.File(filename = 'avatar.' + ext , fp = buffer)
+    embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
+    embed.set_image(url = 'attachment://avatar.' + ext)  
+    await ctx.send(file = fil , embed = embed) 
              
-# @shoegazedistort.error
-# async def shoegazed_err(ctx , err):
-#      if isinstance(err , commands.MissingRequiredArgument):
-#         im = Image.open(requests.get(ctx.message.author.avatar_url, stream = True).raw)
-#         if(im.format=='GIF'):
-#             im.seek(0)
-#         im = randomizeImage(im)    
-#         im = distortImage(im)
-#         buffer = BytesIO()
-#         im.save(buffer , "png")
-#         fil = discord.File(filename = 'avatar.png' , fp = buffer)
-#         buffer.seek(0)
-#         embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
-#         embed.set_image(url = 'attachment://avatar.png')  
-#         await ctx.send(file = fil , embed = embed) 
+@shoegazedistort.error
+async def shoegazed_err(ctx , err):
+     if isinstance(err , commands.MissingRequiredArgument):
+        im = Image.open(requests.get(ctx.message.author.avatar_url, stream = True).raw)
+        if(im.format=='GIF'):
+            im.seek(0)
+        im = randomizeImage(im)    
+        im = distortImage(im)
+        buffer = BytesIO()
+        im.save(buffer , "png")
+        fil = discord.File(filename = 'avatar.png' , fp = buffer)
+        buffer.seek(0)
+        embed = discord.Embed(title = "Here is a shoegaze version of the avatar with distortion")
+        embed.set_image(url = 'attachment://avatar.png')  
+        await ctx.send(file = fil , embed = embed) 
 
-#      if isinstance(err , commands.BadArgument):
-#          await ctx.send('Dude atleast tag a valid member :unamused:')
+     if isinstance(err , commands.BadArgument):
+         await ctx.send('Dude atleast tag a valid member :unamused:')
 
-# @client.command(aliases = ['sgi'])
-# @commands.cooldown(1, 30, commands.BucketType.user)
-# async def shoegazeimage(ctx , *args):
-#     #try: 
-#         im = Image.open(requests.get(args[0], stream = True).raw)
-#         if(im.format=='GIF'):
-#             im.seek(0)
-#         im = randomizeImage(im)
-#         addage = ""
-#         if(len(args)==2 and args[1]=='-d'):
-#             im = distortImage(im)
-#             addage = " with distortion"
-#         buffer = BytesIO()
-#         im.save(buffer , "png")
-#         buffer.seek(0)
-#         fil = discord.File(filename = 'avatar.png' , fp  = buffer)
-#         embed = discord.Embed(title = "Here is a shoegaze version of the image" + addage)
-#         embed.set_image(url = 'attachment://avatar.png')  
-#         await ctx.send(file = fil , embed = embed) 
-#     #except:
-#     #   await ctx.send("invalid url :pensive:")
+@client.command(aliases = ['sgi'])
+@commands.cooldown(1, 30, commands.BucketType.user)
+async def shoegazeimage(ctx , *args):
+    #try: 
+        im = Image.open(requests.get(args[0], stream = True).raw)
+        if(im.format=='GIF'):
+            im.seek(0)
+        im = randomizeImage(im)
+        addage = ""
+        if(len(args)==2 and args[1]=='-d'):
+            im = distortImage(im)
+            addage = " with distortion"
+        buffer = BytesIO()
+        im.save(buffer , "png")
+        buffer.seek(0)
+        fil = discord.File(filename = 'avatar.png' , fp  = buffer)
+        embed = discord.Embed(title = "Here is a shoegaze version of the image" + addage)
+        embed.set_image(url = 'attachment://avatar.png')  
+        await ctx.send(file = fil , embed = embed) 
+    #except:
+    #   await ctx.send("invalid url :pensive:")
 
 #FM COMMANDS
 
