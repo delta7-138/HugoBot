@@ -792,7 +792,9 @@ async def covidworld(ctx , *args):
 async def covidcountry(ctx , *args):
     res = requests.get('https://covid-api.mmediagroup.fr/v1/cases')
     content = json.loads(res.text)
-    country = args[0]
+    country = ""
+    for i in range(len(args)-1):
+        country = country + " " + args[i]
     param = ""
     try:
         countrydata = content[country]
@@ -800,11 +802,11 @@ async def covidcountry(ctx , *args):
             await ctx.send("Missin Arguments :nerd:")
             return ;
 
-        if(args[1]=='-d'):
+        if(args[-1]=='-d'):
             param = "deaths"
-        elif(args[1]=='-r'):
+        elif(args[-1]=='-r'):
             param = "recovered"
-        elif(args[1]=='-c'):
+        elif(args[-1]=='-c'):
             param = "confirmed"
         else:
             await ctx.send("Send appropriate argument :rage:")
@@ -844,13 +846,22 @@ async def covidcountry(ctx , *args):
         buffer.seek(0)
         plt.close()
         fil = discord.File(filename = 'cvc.png' , fp = buffer)
+        embed = discord.Embed(title = "Summary for " + country.upper() , color = 0xff0000)
+        embed.set_footer('data provided by https://covid-api.mmediagroup.fr/v1/')
         await ctx.send(file = fil)
     except:
         await ctx.send("Invalid Country name :rage:")
 
 @client.command(aliases = ['inv'])
 async def invite(ctx):
-    await ctx.send('https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
+    member = ctx.message.author
+    name = member.name
+    if(member.nick!=None):
+        name = member.nick
+    embed = discord.Embed(title = "Invite to HugoBot" , color = 0xff00ea , url = 'https://discord.com/api/oauth2/authorize?client_id=785077511758675988&permissions=0&scope=bot')
+    embed.set_thumbnail(url = client.avatar_url)
+    embed.set_footer('requested by ' + name)
+    await ctx.send(embed = embed)
 
 @client.command()
 async def count(ctx):
