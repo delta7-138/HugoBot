@@ -35,7 +35,7 @@ for key,value in tmpdata.items():
          data[subKey] = subVal
 
 
-def distortImage(im):
+async def distortImage(im):
     im = im.convert('RGB')
     pixels = im.load()
     for i in range(im.size[0]):
@@ -48,7 +48,7 @@ def distortImage(im):
                 im.putpixel((i , j) , tuple(tmp))    
     return im
 
-def randomGen(num):
+async def randomGen(num):
     val = (random.randint(1 , num))**2
     tmpvar = val
     ans = 0
@@ -58,7 +58,7 @@ def randomGen(num):
 
     return int(ans)
     
-def randomizeImage(im):
+async def randomizeImage(im):
     im = im.convert('RGB')
     pixels = im.load()
     xmax = im.size[0]
@@ -71,8 +71,8 @@ def randomizeImage(im):
             k = random.randint(0 , 2)
             l = random.randint(0 , 2)
             random.seed(modes[random.randint(0 , 9)])
-            tmp[k] = randomGen(random.randint(156 , 255))
-            tmp[l] = randomGen(random.randint(1 , 255))
+            tmp[k] = await randomGen(random.randint(156 , 255))
+            tmp[l] = await randomGen(random.randint(1 , 255))
             im.putpixel((i , j) , tuple(tmp))
 
     return im
@@ -274,10 +274,10 @@ async def shoegazeimage(ctx , *args):
         im = Image.open(requests.get(args[0], stream = True).raw)
         if(im.format=='GIF'):
             im.seek(0)
-        im = randomizeImage(im)
+        im = await randomizeImage(im)
         addage = ""
         if(len(args)==2 and args[1]=='-d'):
-            im = distortImage(im)
+            im = await distortImage(im)
             addage = " with distortion"
         buffer = BytesIO()
         im.save(buffer , "png")
