@@ -795,7 +795,8 @@ async def covidcountry(ctx , *args):
     country = ""
     for i in range(len(args)-1):
         country = country + " " + args[i]
-    print(country)
+    
+    country = country.strip()
     param = ""
     try:
         countrydata = content[country]
