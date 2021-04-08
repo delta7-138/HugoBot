@@ -818,7 +818,9 @@ async def covidcountry(ctx , *args):
         resDict = sorted(resDict.items(), key=lambda item: item[1] , reverse= True)
         states = list()
         numbers = list()
-        for i in range(10):
+        maxrange = 10 if(len(states)>=10) else len(states) 
+        
+        for i in range(maxrange):
             states.append(resDict[i][0])
             numbers.append(resDict[i][1])
         
