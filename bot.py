@@ -857,8 +857,8 @@ async def covidcountry(ctx , *args):
 
 @client.command(aliases = ['tpdne' , 'ne'])
 async def thispersondoesnotexist(ctx):
-    await ctx.send('https://thispersondoesnotexist.com/image')
-
+    res = requests.get('https://thispersondoesnotexist.com/image')
+    print(res.text)
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     member = ctx.message.author
