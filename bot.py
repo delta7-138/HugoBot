@@ -872,8 +872,8 @@ async def codeforcesrandomprob(ctx):
     content = json.loads(res.text)
     probNum = random.randint(0 , len(content["result"]["problems"]))
     prob = content["result"]["problems"][probNum]
-    embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*')
-    embed.add_field(name = "points" , value = prob["points"], inline = False , color = 0xffffff)
+    embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*' , color = 0xffffff)
+    embed.add_field(name = "points" , value = prob["points"], inline = False)
     embed.add_field(name = "rating" , value = prob["rating"], inline = False)
     tmpstr = ""
     for i in prob["tags"]:
