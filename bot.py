@@ -502,4 +502,22 @@ async def covidcountry(ctx , *args):
         await ctx.send(file = fil)
     except:
         await ctx.send("Invalid Country name :rage:")
+
+@client.command(aliases = ['codefrand' , 'cfrand'])
+async def codeforcesrandomprob(ctx):
+    res = requests.get('http://codeforces.com/api/problemset.problems')
+    content = json.loads(res.text)
+    probNum = random.randint(0 , len(content["result"]["problems"]))
+    prob = content["result"]["problems"][probNum]
+    embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*')
+    embed.add_field(name = "points" , value = prob["points"], inline = False , color = 0xffffff)
+    embed.add_field(name = "rating" , value = prob["rating"], inline = False)
+    tmpstr = ""
+    for i in prob["tags"]:
+        tmpstr = tmpstr + i + "\n"
+    embed.add_field(name = "tags" , value = tmpstr)
+    embed.set_footer(text = "Random codeforces problem requested by a nerd")
+    embed.set_thumbnail(url = 'https://codeforces.com/predownloaded/3b/86/3b8616d876e29762202e93e184d4373eb62e7274.png')
+    await ctx.send(embed = embed)
+
 client.run(TOKEN)
