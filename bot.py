@@ -97,6 +97,7 @@ async def help(ctx):
     embed.add_field(name = "To get anime quote" , value = "h.aniq" , inline = True)
     embed.add_field(name = "To get Teleport City Summary" , value = "h.standardofliving <city name> aliases = h.sol" , inline = False)
     embed.add_field(name = "Help for COVID info commands" , value = "h.cvhelp" , inline = False)
+    embed.add_field(name = "For Random Codeforces problem" , value = "h.cfrand" , inline = False)
     embed.set_thumbnail(url = thumb)
     embed.set_footer(text = "requested by a busta")
     await ctx.send(embed = embed)
@@ -864,6 +865,23 @@ async def thispersondoesnotexist(ctx):
     fil = discord.File(filename = "ne.png" , fp = buffer)
     buffer.seek(0)
     await ctx.send(file = fil)
+
+@client.command(aliases = ['codefrand' , 'cfrand'])
+async def codeforcesrandomprob(ctx):
+    res = requests.get('http://codeforces.com/api/problemset.problems')
+    content = json.loads(res.text)
+    probNum = random.randint(0 , len(content["result"]["problems"]))
+    prob = content["result"]["problems"][probNum]
+    embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*')
+    embed.add_field(name = "points" , value = prob["points"], inline = False , color = 0xffffff)
+    embed.add_field(name = "rating" , value = prob["rating"], inline = False)
+    tmpstr = ""
+    for i in prob["tags"]:
+        tmpstr = tmpstr + i + "\n"
+    embed.add_field(name = "tags" , value = tmpstr)
+    embed.set_footer(text = "Random codeforces problem requested by a nerd")
+    embed.set_thumbnail(url = 'https://codeforces.com/predownloaded/3b/86/3b8616d876e29762202e93e184d4373eb62e7274.png')
+    await ctx.send(embed = embed)
 
 @client.command(aliases = ['inv'])
 async def invite(ctx):
