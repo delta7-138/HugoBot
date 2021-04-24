@@ -873,7 +873,7 @@ async def codeforcesrandomprob(ctx):
     probNum = random.randint(0 , len(content["result"]["problems"]))
     prob = content["result"]["problems"][probNum]
     embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*' , color = 0xffffff)
-    embed.add_field(name = "points" , value = prob["points"], inline = False)
+    embed.add_field(name = "points" , value = if prob["points"]!=None: prob["points"] else "-" , inline = False)
     embed.add_field(name = "rating" , value = prob["rating"], inline = False)
     tmpstr = ""
     for i in prob["tags"]:
@@ -881,6 +881,20 @@ async def codeforcesrandomprob(ctx):
     embed.add_field(name = "tags" , value = tmpstr)
     embed.set_footer(text = "Random codeforces problem requested by a nerd")
     embed.set_thumbnail(url = 'https://codeforces.com/predownloaded/3b/86/3b8616d876e29762202e93e184d4373eb62e7274.png')
+    await ctx.send(embed = embed)
+
+@client.command(aliases = ['ronq'])
+async def ronswansonquote(ctx):
+    urls = ['https://hips.hearstapps.com/digitalspyuk.cdnds.net/17/18/1493816780-ron-swanson.jpg' , 'https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F13%2F2016%2F10%2F16%2FRon-Swanson-e1476642015275.jpg&q=85' , 'https://i.pinimg.com/originals/50/26/8f/50268f506228d83a5253f57225672c42.png']
+    member = ctx.message.author
+    name = member.name
+    if(member.nick!=None):
+        name = member.nick
+    res = requests.get("https://ron-swanson-quotes.herokuapp.com/v2/quotes")
+    content = json.loads(res.text)
+    embed = discord.Embed(title = "Ron Swanson Quote" , description = content[0] , color = 0xff0000)
+    embed.set_thumbnail(url = urls[random.randint(0 , len(urls)-1)])
+    embed.set_footer(text = "requested by " + name)
     await ctx.send(embed = embed)
 
 @client.command(aliases = ['inv'])
