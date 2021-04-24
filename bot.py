@@ -876,7 +876,7 @@ async def codeforcesrandomprob(ctx):
     if(prob["points"]!=None):
         points = prob["points"]
     embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*' , color = 0xffffff)
-    embed.add_field(name = "points" , value =  else: "-" , inline = False)
+    embed.add_field(name = "points" , value = points, inline = False)
     embed.add_field(name = "rating" , value = prob["rating"], inline = False)
     tmpstr = ""
     for i in prob["tags"]:
