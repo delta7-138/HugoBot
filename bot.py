@@ -886,6 +886,41 @@ async def codeforcesrandomprob(ctx):
     embed.set_thumbnail(url = 'https://codeforces.com/predownloaded/3b/86/3b8616d876e29762202e93e184d4373eb62e7274.png')
     await ctx.send(embed = embed)
 
+@client.command(aliases = ['cftag' , 'cft'])
+async def codeforcesprobwithtag(ctx , * , args):
+    tags = urllib.parse.urlencode({'tags' : args})
+    res = requests.get('http://codeforces.com/api/problemset.problems?' + tags)
+    content = json.loads(res.text)
+    if(len(content["result"]["problems"])==0):
+        await ctx.message.add_reaction("😠")
+        await ctx.send("Invalid tags :nerd:")
+    else:
+        probNum = random.randint(0 , len(content["result"]["problems"]))
+        prob = content["result"]["problems"][probNum]
+        points = "-"
+        if("points" in prob and prob["points"]!=None):
+            points = prob["points"]
+        embed = discord.Embed(title = prob["name"] , url = "http://codeforces.com/problemset/problem/" + str(prob["contestId"]) + "/" + prob["index"] , description = 'Type : *' + prob["type"] + '*' , color = 0xfffbff)
+        embed.add_field(name = "points" , value = points, inline = False)
+        embed.add_field(name = "rating" , value = prob["rating"], inline = False)
+        tmpstr = ""
+        for i in prob["tags"]:
+            tmpstr = tmpstr + i + "\n"
+        embed.add_field(name = "tags" , value = tmpstr)
+        embed.set_footer(text = "Random " + args + " problem requested by a nerd")
+        embed.set_thumbnail(url = 'https://codeforces.com/predownloaded/3b/86/3b8616d876e29762202e93e184d4373eb62e7274.png')
+        rating = int(prob["rating"])
+        emoji = ""
+        if(rating<=1200):
+            emoji = "🚮"
+        elif(rating<=2200):
+            emoji = "😈"
+        else:
+            emoji = "😨"
+        await ctx.message.add_reaction("✅")
+        msg = await ctx.send(embed = embed)
+        await msg.add_reaction(emoji)
+
 @client.command(aliases = ['ronq'])
 async def ronswansonquote(ctx):
     urls = ['https://hips.hearstapps.com/digitalspyuk.cdnds.net/17/18/1493816780-ron-swanson.jpg' , 'https://imagesvc.meredithcorp.io/v3/mm/image?url=https%3A%2F%2Fstatic.onecms.io%2Fwp-content%2Fuploads%2Fsites%2F13%2F2016%2F10%2F16%2FRon-Swanson-e1476642015275.jpg&q=85' , 'https://i.pinimg.com/originals/50/26/8f/50268f506228d83a5253f57225672c42.png']
