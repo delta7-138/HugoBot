@@ -606,7 +606,11 @@ async def deletestudylog(ctx , *args):
         await ctx.send("invalid message :rage:")
     else:
         embeds = msg.embeds
-        title = (embeds[0].to_dict())["title"]
+        res = embeds[0].to_dict()
+        title = res["title"]
+        author = res["fields"][0]["value"]
+        print(res)
+        print(author)
         if(title.startswith("Study Log for")):
             await msg.delete()
 client.run(TOKEN)
