@@ -598,4 +598,15 @@ async def addstudylog(ctx , *args):
     await ctx.message.add_reaction("✅")
     await ctx.reply(embed = embed , mention_author = True)
 
+@client.command(aliases = ['deletelog'  'dellog' , 'dstl'])
+async def deletestudylog(ctx , *args):
+    message_id = args[0]
+    msg = await ctx.fetch_message(message_id)
+    if(msg.author!=client.user):
+        await ctx.send("invalid message :rage:")
+    else:
+        embeds = msg.embeds
+        title = (embeds[0].to_dict())["title"]
+        if(title.startswith("Study Log for")):
+            await msg.delete()
 client.run(TOKEN)
