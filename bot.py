@@ -956,6 +956,7 @@ async def addstudylog(ctx , *args):
     if(user.nick!=None):
         nick = user.nick
     embed = discord.Embed(title = "Study Log for " + datetime.datetime.today().strftime('%d-%m-%Y') , color = 0x573ed6)
+    embed.add_field(name = "Student" , value = user)
     embed.add_field(name = "Start" , value = start , inline = True)
     embed.add_field(name = "End" , value = end , inline = True)
     embed.add_field(name = "Time Spent" , value = diff_time , inline = False)
@@ -972,8 +973,10 @@ async def deletestudylog(ctx , *args):
         await ctx.send("invalid message :rage:")
     else:
         embeds = msg.embeds
-        title = (embeds[0].to_dict())["title"]
-        if(title.startswith("Study Log for")):
+        res = embeds[0].to_dict()
+        title = res["title"]
+        user = res["Student"] 
+        if(title.startswith("Study Log for") and user==ctx.message.author):
             await msg.delete()
             
 @client.command(aliases = ['inv'])
