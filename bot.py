@@ -5,6 +5,7 @@ import requests
 import datetime as dt
 from firebase import firebase 
 from math import *
+import datetime
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -568,5 +569,33 @@ async def ronswansonquote(ctx):
     embed.set_thumbnail(url = urls[random.randint(0 , len(urls)-1)])
     embed.set_footer(text = "requested by " + name)
     await ctx.send(embed = embed)
-    
+
+@client.command(aliases = ['astl' , 'astlog'])
+async def addstudylog(ctx , *args):
+    start = args[0]
+    end = args[1]
+    obj1 = datetime.datetime.strptime(start , "%H%M")
+    obj2 = datetime.datetime.strptime(end , "%H%M")
+    if(obj2<obj1):
+        tmp = start
+        start = end
+        end = tmp
+        tmp = obj1 
+        obj1 = obj2
+        obj2 = tmp
+
+    diff_time = str(obj2 - obj1)
+    user = ctx.message.author
+    nick = user.name
+    if(user.nick!=None):
+        nick = user.nick
+    embed = discord.Embed(title = "Study Log for " + datetime.datetime.today().strftime('%d-%m-%Y') , color = 0x573ed6)
+    embed.add_field(name = "Start" , value = start , inline = True)
+    embed.add_field(name = "End" , value = end , inline = True)
+    embed.add_field(name = "Time Spent" , value = diff_time , inline = False)
+    embed.set_thumbnail(url = "https://cdn.corporatefinanceinstitute.com/assets/10-Poor-Study-Habits-Opener.jpeg")
+    embed.set_footer(text = "requested by {}".format(nick))
+    await ctx.message.add_reaction("✅")
+    await ctx.reply(embed = embed , mention_author = True)
+
 client.run(TOKEN)
