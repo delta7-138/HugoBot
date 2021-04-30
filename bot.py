@@ -974,10 +974,9 @@ async def deletestudylog(ctx , *args):
     else:
         embeds = msg.embeds
         res = embeds[0].to_dict()
-        title = res["title"]
+        title = str(res["title"])
         author = res["fields"][0]["value"]
-        print(title)
-        if(title.startswith("Study Log for") and author==ctx.message.author):
+        if(title.startswith("Study Log for") and str(author)==str(ctx.message.author)):
             await msg.delete()
             
 @client.command(aliases = ['inv'])
