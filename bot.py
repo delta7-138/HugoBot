@@ -35,6 +35,27 @@ for key,value in tmpdata.items():
      for subKey, subVal in value.items():
          data[subKey] = subVal
 
+async def add_time(obj1 , obj2):
+    h1 = obj1.hour;
+    h2 = obj2.hour;
+
+    m1 = obj1.minute;
+    m2 = obj2.minute;
+
+    s1 = obj1.second;
+    s2 = obj2.second;
+
+    carry_s = int((s1 + s2)/60)
+    sum_s = int((s1+s2)%60)
+
+    carry_m = int((m1 + m2 + carry_s)/60)
+    sum_m = int((m1 + m2 + carry_s)%60)
+
+    sum_h = int((h1 + h2 + carry_m))
+    finaltime = "{sum_h}:{sum_m}:{sum_s}".format(sum_h = sum_h , sum_m = sum_m , sum_s = sum_s)
+    finaltimeobj = datetime.datetime.strptime(finaltime , "%H:%M:%S")
+    return finaltimeobj
+
 async def distortImage(im):
     im = im.convert('RGB')
     pixels = im.load()
@@ -936,8 +957,32 @@ async def ronswansonquote(ctx):
     embed.set_footer(text = "requested by " + name)
     await ctx.send(embed = embed)
 
+@client.command(aliases = ['stz'])
+async def settimezone(ctx , *args):
+    tz = args[0]
+    tmp = {str(ctx.message.author.id) : {"timezone" : tz , "logs" : ["0"]}}
+    result = firebaseObj.post('/study' , tmp)
+    print(result)
+    await ctx.message.add_reaction("✅")
+    await ctx.reply("Successfully added" , mention_author = True)
+    
 @client.command(aliases = ['astl' , 'astlog'])
 async def addstudylog(ctx , *args):
+    studydata = firebaseObj.get('/study' , None)
+    studylogs = list(studydata.values())
+    author_id = str(ctx.message.author.id)
+    index = 0
+    for i in range(len(studylogs)):
+        tmp = studylogs[i]
+        for key,value in tmp.items():
+            if(key==author_id):
+                index = i
+    
+    studydata_id = list(studydata.keys())[index]
+    tz = studylogs[index][author_id]["timezone"]
+    logs = studylogs[index][author_id]["logs"]
+    now_time_utc = datetime.datetime.now(pytz.timezone("UTC"))
+    actual_now = now_time_utc.astimezone(pytz.timezone(tz))
     start = args[0]
     end = args[1]
     obj1 = datetime.datetime.strptime(start , "%H%M")
@@ -955,15 +1000,39 @@ async def addstudylog(ctx , *args):
     nick = user.name
     if(user.nick!=None):
         nick = user.nick
-    embed = discord.Embed(title = "Study Log for " + datetime.datetime.today().strftime('%d-%m-%Y') , color = 0x573ed6)
-    embed.add_field(name = "Student" , value = user)
+    embed = discord.Embed(title = "Study Log for " + actual_now.strftime('%d-%m-%Y') , color = 0x573ed6)
     embed.add_field(name = "Start" , value = start , inline = True)
     embed.add_field(name = "End" , value = end , inline = True)
     embed.add_field(name = "Time Spent" , value = diff_time , inline = False)
     embed.set_thumbnail(url = "https://cdn.corporatefinanceinstitute.com/assets/10-Poor-Study-Habits-Opener.jpeg")
     embed.set_footer(text = "requested by {}".format(nick))
+    log = {"str" : start , "end" : end , "diff" : diff_time , "date" : actual_now.strftime('%d-%m-%Y')}
+    logs.append(log)
+    res = firebaseObj.put('/study/' + studydata_id + '/' + author_id , "logs" , logs)
     await ctx.message.add_reaction("✅")
     await ctx.reply(embed = embed , mention_author = True)
+
+@client.command(aliases = ['caltotdate' , 'caldate' , 'cltd'])
+async def calculatetotaltimebydate(ctx , *args):
+    date = args[0]  
+    studydata = firebaseObj.get('/study' , None)
+    studylogs = list(studydata.values())
+    author_id = str(ctx.message.author.id)
+    index = 0
+    for i in range(len(studylogs)):
+        tmp = studylogs[i]
+        for key,value in tmp.items():
+            if(key==author_id):
+                index = i
+
+    logs = studylogs[index][author_id]["logs"]
+    timeobj = datetime.datetime.strptime("0:00:00" , "%H:%M:%S")
+    for i in logs[1:]:
+        if(i["date"]==date):
+            tmp = datetime.datetime.strptime(i["diff"] , "%H:%M:%S")
+            timeobj = await add_time(timeobj , tmp)
+    await ctx.message.add_reaction("✅")
+    await ctx.reply("You studied for time equal to **" + str(timeobj.time()) + "** on " + date , mention_author = True)
 
 @client.command(aliases = ['deletelog'  'dellog' , 'dstl'])
 async def deletestudylog(ctx , *args):
