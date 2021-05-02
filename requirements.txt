@@ -1,5 +1,6 @@
 discord.py
 numpy
+pytz
 matplotlib
 python-dotenv
 pillow
