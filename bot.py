@@ -6,6 +6,7 @@ import datetime as dt
 from math import *
 from firebase import firebase
 import datetime
+import pytz
 
 import json
 from discord.ext import commands
@@ -965,7 +966,7 @@ async def settimezone(ctx , *args):
     print(result)
     await ctx.message.add_reaction("✅")
     await ctx.reply("Successfully added" , mention_author = True)
-    
+
 @client.command(aliases = ['astl' , 'astlog'])
 async def addstudylog(ctx , *args):
     studydata = firebaseObj.get('/study' , None)
