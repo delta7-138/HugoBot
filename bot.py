@@ -671,6 +671,23 @@ async def calculatetotaltimebydate(ctx , *args):
     await ctx.message.add_reaction("✅")
     await ctx.reply("You studied for time equal to **" + str(timeobj.time()) + "** on " + date , mention_author = True)
 
+@client.command(aliases = ['av' , 'avtr'])
+async def avatar(ctx , member : discord.Member):
+    embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
+    embed.set_image(url = member.avatar_url)
+    await ctx.reply(embed = embed , mention_author = True)
+
+@avatar.error
+async def avatar_err(ctx , err):
+    if isinstance(err , commands.MissingRequiredArgument):
+        member = ctx.message.author
+        embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
+        embed.set_image(url = member.avatar_url)
+        await ctx.reply(embed = embed ,mention_author = True)
+    
+    if isinstance(err , commands.BadArgument):
+        await ctx.reply("Wrong argument" , mention_author = True)
+
 @client.command(aliases = ['deletelog'  'dellog' , 'dstl'])
 async def deletestudylog(ctx , *args):
     message_id = args[0]
