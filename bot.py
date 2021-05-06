@@ -103,6 +103,7 @@ async def randomizeImage(im):
 
 @client.event
 async def on_ready():
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('Under Construction Right Now'))
     print('We have logged in as {0.user}'.format(client))
 
 
@@ -684,7 +685,7 @@ async def avatar_err(ctx , err):
         embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
         embed.set_image(url = member.avatar_url)
         await ctx.reply(embed = embed ,mention_author = True)
-    
+        
     if isinstance(err , commands.BadArgument):
         await ctx.reply("Wrong argument" , mention_author = True)
 
