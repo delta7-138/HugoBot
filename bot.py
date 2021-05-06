@@ -1048,7 +1048,24 @@ async def deletestudylog(ctx , *args):
         author = res["fields"][0]["value"]
         if(title.startswith("Study Log for") and str(author)==str(ctx.message.author)):
             await msg.delete()
-            
+
+@client.command(aliases = ['av' , 'avtr'])
+async def avatar(ctx , member : discord.Member):
+    embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
+    embed.set_image(url = member.avatar_url)
+    await ctx.reply(embed = embed , mention_author = True)
+
+@avatar.error
+async def avatar_err(ctx , err):
+    if isinstance(err , commands.MissingRequiredArgument):
+        member = ctx.message.author
+        embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
+        embed.set_image(url = member.avatar_url)
+        await ctx.reply(embed = embed ,mention_author = True)
+        
+    if isinstance(err , commands.BadArgument):
+        await ctx.reply("Wrong argument" , mention_author = True)      
+          
 @client.command(aliases = ['inv'])
 async def invite(ctx):
     member = ctx.message.author
