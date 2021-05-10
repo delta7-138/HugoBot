@@ -101,7 +101,7 @@ async def randomizeImage(im):
 
 @client.event
 async def on_ready():
-    await client.change_presence(activity=discord.Streaming(name="Hunter's Birthday" , url = "https://twitch.tv/hu_nt3r_g0"))
+    await client.change_presence(activity=discord.Game(name="my life"))
     print('We have logged in as {0.user}'.format(client))
 
 #help commands
