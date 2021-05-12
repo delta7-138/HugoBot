@@ -26,6 +26,7 @@ API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
+client.load_extension("cogs.user")
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
@@ -672,22 +673,6 @@ async def calculatetotaltimebydate(ctx , *args):
     await ctx.message.add_reaction("✅")
     await ctx.reply("You studied for time equal to **" + str(timeobj.time()) + "** on " + date , mention_author = True)
 
-@client.command(aliases = ['av' , 'avtr'])
-async def avatar(ctx , member : discord.Member):
-    embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
-    embed.set_image(url = member.avatar_url)
-    await ctx.reply(embed = embed , mention_author = True)
-
-@avatar.error
-async def avatar_err(ctx , err):
-    if isinstance(err , commands.MissingRequiredArgument):
-        member = ctx.message.author
-        embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
-        embed.set_image(url = member.avatar_url)
-        await ctx.reply(embed = embed ,mention_author = True)
-        
-    if isinstance(err , commands.BadArgument):
-        await ctx.reply("Wrong argument" , mention_author = True)
 
 @client.command(aliases = ['deletelog'  'dellog' , 'dstl'])
 async def deletestudylog(ctx , *args):
