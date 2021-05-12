@@ -1,4 +1,8 @@
+import discord
 from discord.ext import commands
+import random
+from PIL import Image
+from io import BytesIO
 
 class Color(commands.Cog):
     def __init__(self , bot):
@@ -58,5 +62,5 @@ class Color(commands.Cog):
         except:
             await ctx.send("invalid hex :rage:")
 
-def setup(bot)
+def setup(bot):
     bot.add_cog(Color(bot))
