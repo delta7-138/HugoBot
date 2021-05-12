@@ -26,7 +26,7 @@ API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
-cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces"]
+cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc"]
 for cog in cogs:
     client.load_extension(cog)
 client.remove_command('help')
@@ -130,35 +130,6 @@ async def hello(ctx):
     await ctx.send(f'Hello There!')
 
 
-@client.command(aliases = ['rand'])
-async def randomname(ctx , *args):
-    if(len(args)==1):
-        num = int(args[0])
-        if(num<=5 and num>0):
-            final_msg = ""
-            for i in range(num):
-                f_ind = random.randint(0 , len(first_names)-1)
-                l_ind = random.randint(0 , len(last_names)-1)
-                random.shuffle(first_names)
-                random.shuffle(last_names)
-                name = first_names[f_ind] + " " + last_names[l_ind]
-                final_msg = final_msg + name + "\n"
-                    
-            await ctx.send(final_msg)
-
-        elif(num==0):
-            await ctx.send("Do you really want a name or you just want to waste my time?") 
-        else:
-            await ctx.send("How many names do you need man! :nerd:")
-    elif(len(args)==0):
-        f_ind = random.randint(0 , len(first_names)-1)
-        l_ind = random.randint(0 , len(last_names)-1)
-        random.shuffle(first_names)
-        random.shuffle(last_names)
-        name = first_names[f_ind] + " " + last_names[l_ind]
-        await ctx.send(name)
-    else:
-        await ctx.send("Send valid arguments ya :nerd:")
 
 @client.command()
 async def mars(ctx , *args):
@@ -192,20 +163,7 @@ async def apod(ctx):
     embed.set_image(url = gdata['hdurl'])
     await ctx.send(embed = embed)
 
-@client.command(aliases = ['nrand'])
-async def randomnum(ctx , *args):
-    try:
-        num1 = int(args[0])
-        num2 = int(args[1])
-        if(num1>num2):
-            await ctx.send('First argument should be less than the second one')
-        elif(num1==num2):
-            await ctx.send('Do you really want a random number :|')
-        else:
-            randnum = random.randint(num1 , num2)
-            await ctx.send(randnum)
-    except:
-        await ctx.send('Please send valid input :pleading_face:')
+
 
 @client.command(aliases = ['sg'])
 async def shoegaze(ctx , member :  discord.Member): 
