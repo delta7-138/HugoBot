@@ -26,7 +26,9 @@ API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
-client.load_extension("cogs.user")
+cogs = ["cogs.user" , "cogs.color"]
+for cog in cogs:
+    client.load_extension(cog)
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
@@ -127,25 +129,6 @@ async def help(ctx):
 async def hello(ctx): 
     await ctx.send(f'Hello There!')
 
-@client.command()
-async def color(ctx):
-    hex_number_string = '#'
-    for i in range(6):
-        randnum = random.randint(0 , 15)
-        hexstr = str(hex(randnum)).upper()
-        hexelem = hexstr[2:]
-        hex_number_string = hex_number_string + hexelem
-        
-    hex_int = int(hex_number_string[1:] , 16)
-    im = Image.new("RGB" , (100 , 100) , hex_number_string)
-    buffer = BytesIO()
-    im.save(buffer , "png")
-    buffer.seek(0)
-    file = discord.File(filename = 'randcolor.png' , fp = buffer)
-    embed = discord.Embed(title = 'Random Color' , color = hex_int)
-    embed.add_field(name = "Color" , value = hex_number_string)
-    embed.set_image(url = 'attachment://randcolor.png')
-    await ctx.send(file = file , embed = embed) 
 
 @client.command(aliases = ['rand'])
 async def randomname(ctx , *args):
