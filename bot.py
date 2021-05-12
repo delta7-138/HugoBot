@@ -26,6 +26,11 @@ FIREBASE_URL = os.getenv('FIREBASE_URL')
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix = 'h.' , intents = intents)
+cogs = ['cogs.color']
+
+for cog in cogs:
+    client.load_extension(cog)
+    
 client.remove_command('help')
 modes = [100 , 200 , 127 , 265 , 246 , 110 , 1 , 34 , 124 , 245]
 firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
@@ -134,15 +139,6 @@ async def astrohelp(ctx):
     embed.set_thumbnail(url = 'https://i.insider.com/502292d36bb3f76241000009?width=1100&format=jpeg&auto=webp')
     await ctx.send(embed = embed)
 
-@client.command(aliases = ['ch'])
-async def colorhelp(ctx):
-    embed = discord.Embed(title = 'Hugo Color Help' , color = 0x00ffea)
-    embed.add_field(name = "Random color" , value = "h.color aliases(h.col)")
-    embed.add_field(name = "Generate color with hex code" , value = "h.genc `hexcode` aliases(h.gencolor)")
-    embed.set_thumbnail(url = thumb)
-    embed.set_footer(text = 'requested by a busta')
-    await ctx.send(embed = embed)
-
 @client.command(aliases = ['fmh'])
 async def fmhelp(ctx):
     embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
@@ -168,46 +164,6 @@ async def cvhelp(ctx):
     embed.set_thumbnail(url = 'https://www.statnews.com/wp-content/uploads/2020/02/Coronavirus-CDC-645x645.jpg')
     await ctx.send(embed = embed)
 
-@client.command(aliases = ['col'])
-async def color(ctx):
-    hex_number_string = '#'
-    for i in range(6):
-        randnum = random.randint(0 , 15)
-        hexstr = str(hex(randnum)).upper()
-        hexelem = hexstr[2:]
-        hex_number_string = hex_number_string + hexelem
-        
-    hex_int = int(hex_number_string[1:] , 16)
-    im = Image.new("RGB" , (100 , 100) , hex_number_string)
-    buffer = BytesIO()
-    im.save(buffer , "png")
-    buffer.seek(0)
-    file = discord.File(filename = 'randcolor.png' , fp = buffer)
-    embed = discord.Embed(title = 'Random Color' , color = hex_int)
-    embed.add_field(name = "Color" , value = hex_number_string)
-    embed.set_image(url = 'attachment://randcolor.png')
-    await ctx.send(file = file , embed = embed) 
-
-@client.command(aliases = ['genc' , 'gencol' , 'gc'])
-async def gencolor(ctx , * , args):
-    hex_number_string = args.upper()
-    hex_int = 0
-    if(len(hex_number_string)!=7):
-        await ctx.send("invalid hex :rage:")
-        return ;
-    try:
-        hex_int = int(hex_number_string[1:] , 16)
-        im = Image.new("RGB" , (100 , 100) , hex_number_string)
-        buffer = BytesIO()
-        im.save(buffer , "png")
-        buffer.seek(0)
-        file = discord.File(filename = 'color.png' , fp = buffer)
-        embed = discord.Embed(title = 'Color' , color = hex_int)
-        embed.add_field(name = "Color" , value = hex_number_string)
-        embed.set_image(url = 'attachment://color.png')
-        await ctx.send(file = file , embed = embed) 
-    except:
-        await ctx.send("invalid hex :rage:")
 
 @client.command(aliases = ['rand'])
 async def randomname(ctx , *args):
