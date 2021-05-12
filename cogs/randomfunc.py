@@ -1,6 +1,7 @@
 import discord
 import random
 from discord.ext import commands
+from listofnames import first_names, last_names
 
 class RandomFunc(commands.Cog):
     def __init__(self , bot):
