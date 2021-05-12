@@ -58,5 +58,5 @@ class Color(commands.Cog):
         except:
             await ctx.send("invalid hex :rage:")
 
-def setup(client)
-    client.add_cog(Color(client))
+def setup(bot)
+    bot.add_cog(Color(bot))
