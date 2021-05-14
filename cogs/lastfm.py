@@ -200,7 +200,7 @@ class Lastfm(commands.Cog):
         ctr = 0
         for key,value in leaderBoard:
             ctr+=1
-            description = key + '  -  ' + '**' + str(value) + '** plays \n'
+            description = description + str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
         embed.set_image(url = image)
@@ -244,7 +244,7 @@ class Lastfm(commands.Cog):
                 ctr = 0
                 for key,value in leaderBoard:
                     ctr+=1
-                    description = key + '  -  ' + '**' + str(value) + '** plays \n'
+                    description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
                 embed.set_image(url = image)
@@ -277,7 +277,7 @@ class Lastfm(commands.Cog):
         ctr = 0
         for key,value in leaderBoard:
             ctr+=1
-            description = key + '  -  ' + '**' + str(value) + '** plays \n'
+            description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
         embed.set_image(url = image)
@@ -321,7 +321,7 @@ class Lastfm(commands.Cog):
                 ctr = 0
                 for key,value in leaderBoard:
                     ctr+=1
-                    description = key + '  -  ' + '**' + str(value) + '** plays \n'
+                    description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
                 embed.set_image(url = image)
