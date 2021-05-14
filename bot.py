@@ -393,9 +393,9 @@ async def count(ctx):
 
 @client.command()
 async def contrib(ctx):
-    embed = discord.Embed(title = "HugoBot Github Repository" , url = "https://github.com/delta7-138/HugoBot" , description = "_Github repo containing the code to this project. Feel free to contribute._" , color = 0xff00ea)
-    embed.set_footer("requested by " + ctx.message.author.name)
-    embed.set_thumbnail("https://avatars.githubusercontent.com/u/53052253?v=4")
+    embed = discord.Embed(title = "HugoBot Github Repository" , url = "https://github.com/delta7-138/HugoBot.git" , description = "_Github repo containing the code to this project. Feel free to contribute._" , color = 0xff00ea)
+    embed.set_footer(text = "requested by " + ctx.message.author.name)
+    embed.set_thumbnail(url = "https://avatars.githubusercontent.com/u/53052253?v=4")
     await ctx.reply(embed = embed , mention_author = True)
 
 client.run(TOKEN)
