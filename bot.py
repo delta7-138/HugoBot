@@ -19,14 +19,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 TOKEN = os.environ['DISCORD_TOKEN']
-API_TOKEN = os.environ['API_TOKEN']
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix = 'h.' , intents = intents)
-cogs = ['cogs.color' , 'cogs.codeforces' , 'cogs.randomfunc']
+cogs = ['cogs.color' , 'cogs.codeforces' , 'cogs.randomfunc' , 'cog.mars']
 
 for cog in cogs:
     client.load_extension(cog)
@@ -162,28 +161,6 @@ async def cvhelp(ctx):
     embed.set_footer(text = 'requsted by ' + str(name))
     embed.set_thumbnail(url = 'https://www.statnews.com/wp-content/uploads/2020/02/Coronavirus-CDC-645x645.jpg')
     await ctx.send(embed = embed)
-
-@client.command()
-async def mars(ctx , *args):
-    if(len(args)==1):
-        sol = args[0]
-        gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=' + sol + '&camera=fhaz&api_key=' + API_TOKEN)
-        gdata = gres.json()
-        ind = random.randint(0 , len(gdata['photos'])-1)
-        await ctx.send(gdata['photos'][ind]['img_src'])
-    else:
-        try:
-            reference_args = {'o' : 'opportunity' , 'c' : 'curiosity' , 's' : 'spirit'}
-            sol = args[0]
-            cam = args[1].lower()
-            rover = reference_args[args[2].lower()]
-            #print(rover)
-            gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/' + rover + '/photos?sol=' + sol + '&camera=' + cam + '&api_key=' + API_TOKEN)
-            gdata = gres.json()
-            ind = random.randint(0 , len(gdata['photos'])-1)
-            await ctx.send(gdata['photos'][ind]['img_src'])
-        except: 
-            await ctx.send('Image not available :pensive:')
 
 @client.command()
 async def apod(ctx):
