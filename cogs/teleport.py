@@ -1,6 +1,7 @@
 import discord
 import requests
 import json
+import urllib.parse
 from discord.ext import commands
 
 class Teleport(commands.Cog):

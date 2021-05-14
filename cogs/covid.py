@@ -4,6 +4,7 @@ import json
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+from io import BytesIO
 
 from discord.ext import commands
 
