@@ -203,7 +203,7 @@ class Lastfm(commands.Cog):
             description = description + str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
-        embed.set_image(url = image)
+        embed.set_thumbnail(url = image)
         await ctx.send(embed = embed) 
 
     @fmwhoknowsalbum.error
@@ -247,7 +247,7 @@ class Lastfm(commands.Cog):
                     description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
-                embed.set_image(url = image)
+                embed.set_thumbnail(url = image)
                 await ctx.send(embed = embed) 
 
     @commands.command(aliases = ['fmwt' , 'fmwkt'])
@@ -280,7 +280,7 @@ class Lastfm(commands.Cog):
             description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
-        embed.set_image(url = image)
+        embed.set_thumbnail(url = image)
         await ctx.send(embed = embed) 
 
     @fmwhoknowstrack.error
@@ -324,7 +324,7 @@ class Lastfm(commands.Cog):
                     description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
-                embed.set_image(url = image)
+                embed.set_thumbnail(url = image)
                 await ctx.send(embed = embed)    
 
 
