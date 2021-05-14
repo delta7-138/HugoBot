@@ -1,0 +1,76 @@
+import discord
+import datetime
+import requests
+import json
+import os
+import time
+import random
+from discord.ext import commands
+        
+
+class Mars(commands.Cog):
+    def __init__(self , bot):
+        self.bot = bot
+    
+    async def maxsol(self , rovername , today):
+        startc = 1344191400 
+        if(rovername=="c"):
+            diff = time.mktime(today.timetuple()) - startc
+            days_diff = diff/60/60/24 - 100
+            return days_diff
+        elif(rovername=="s"):
+            diff = 2200
+            return diff
+        elif(rovername=="o"):
+            return 5100
+
+    @commands.command()
+    async def mars(self, ctx , *args):
+        try:
+            reference_args = {'o' : 'opportunity' , 'c' : 'curiosity' , 's' : 'spirit'}
+            dict_params = {'rover' : ""  , 'camera type' : "" , 'sol' : 0 , 'url' : ""}
+            list_vals = []
+            for i in args:
+                list_vals.append(i)
+            
+            for i in range(3 - len(args)):
+                list_vals.append("")
+
+            if(list_vals[0]==""):
+                randrover = list(reference_args.keys())[random.randint(0 , 2)]
+                dict_params['rover'] = randrover
+            else:
+                dict_params['rover'] = list_vals[0]
+            
+            if(list_vals[1]==""):
+                dict_params['camera type'] = 'fhaz'
+            else:
+                dict_params['camera type'] = list_vals[1]
+            
+            if(list_vals[2]==""):
+                today = datetime.datetime.today()
+                maxlimit = await self.maxsol(dict_params['rover'] , today)
+                randsol = random.randint(1 , int(maxlimit))
+                dict_params['sol'] = randsol
+            else:
+                dict_params['sol'] = int(list_vals[2])
+                
+            gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/' + reference_args[dict_params['rover']]+ '/photos?sol=' + str(dict_params['sol']) + '&camera=' + dict_params['camera type'] + '&api_key=' + API_TOKEN)
+            gdata = gres.json()
+            ind = random.randint(0 , len(gdata['photos'])-1)
+            dict_params['url'] = gdata['photos'][ind]['img_src']
+
+            embed = discord.Embed(title = "MARS ROVER IMAGE" , color = 0x934838)
+            embed.add_field(name = "Rover name" , value = reference_args[dict_params['rover']] , inline = False)
+            embed.add_field(name = "Camera Type" , value = dict_params['camera type'] , inline = False)
+            embed.add_field(name = "Sol" , value = dict_params['sol'] , inline = False)
+            embed.set_image(url = dict_params['url'])
+            embed.set_footer(text = "requested by a nerd")
+            await ctx.reply(embed = embed , mention_author = True)
+        except: 
+            await ctx.reply("No image available :pensive:" , mention_author = True)
+
+    
+
+def setup(bot):
+    bot.add_cog(Mars(bot))

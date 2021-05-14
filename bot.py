@@ -26,7 +26,7 @@ API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
-cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc"]
+cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc" , "cogs.mars"]
 for cog in cogs:
     client.load_extension(cog)
 client.remove_command('help')
@@ -129,29 +129,6 @@ async def help(ctx):
 async def hello(ctx): 
     await ctx.send(f'Hello There!')
 
-
-
-@client.command()
-async def mars(ctx , *args):
-    if(len(args)==1):
-        sol = args[0]
-        gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=' + sol + '&camera=fhaz&api_key=' + API_TOKEN)
-        gdata = gres.json()
-        ind = random.randint(0 , len(gdata['photos'])-1)
-        await ctx.send(gdata['photos'][ind]['img_src'])
-    else:
-        try:
-            reference_args = {'o' : 'opportunity' , 'c' : 'curiosity' , 's' : 'spirit'}
-            sol = args[0]
-            cam = args[1].lower()
-            rover = reference_args[args[2].lower()]
-            #print(rover)
-            gres = requests.get('https://api.nasa.gov/mars-photos/api/v1/rovers/' + rover + '/photos?sol=' + sol + '&camera=' + cam + '&api_key=' + API_TOKEN)
-            gdata = gres.json()
-            ind = random.randint(0 , len(gdata['photos'])-1)
-            await ctx.send(gdata['photos'][ind]['img_src'])
-        except: 
-            await ctx.send('Image not available :pensive:')
 
 @client.command()
 async def apod(ctx):
