@@ -71,7 +71,12 @@ class Mars(commands.Cog):
         except: 
             await ctx.reply("No image available :pensive:" , mention_author = True)
 
-    
+    @commands.command(aliases = ['marsh' , 'mh'])
+    async def marshelp(self , ctx):
+        embed = discord.Embed(name = "Mars Help" , description = "Basic Format of command is `h.mars <rover name> <camera type> <sol number> \n rover name = 'c' 'o' or 's'\n camera type = 'fhaz' 'rhaz' 'navcam' 'mardi' 'mast' 'chemcam' \n sol number is an rover day number on mars ", color = 0x934838)
+        embed.set_footer(text = "requested by a nerd")
+        embed.set_thumbnail(url = "https://mars.nasa.gov/system/content_pages/main_images/418_marsglobe.jpg")
+        await ctx.reply(embed = embed , mention_author = True)
 
 def setup(bot):
     bot.add_cog(Mars(bot))
