@@ -1,5 +1,5 @@
 import discord
-from discod.ext import commands
+from discord.ext import commands
 
 class User(commands.Cog):
     def __init__(self , bot):
