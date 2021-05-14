@@ -5,7 +5,7 @@ class User(commands.Cog):
     def __init__(self , bot):
         self.bot = bot
 
-    @commands.command(alises = ['uh' , 'userh'])
+    @commands.command(aliases = ['uh' , 'userh'])
     async def userhelp(self , ctx):
         embed = discord.Embed(title = "User Info Help" , color = 0xff00ff)
         embed.add_field(name = "Get user avatar" , value = "h.av <mention member> or h.av" , inline = False)
