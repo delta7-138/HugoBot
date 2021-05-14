@@ -23,7 +23,19 @@ class Lastfm(commands.Cog):
         for key,value in tmpdata.items(): 
             for subKey, subVal in value.items():
                 self.data[subKey] = subVal
-    
+
+    @commands.command(aliases = ['fmh'])
+    async def fmhelp(self , ctx):
+        embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
+        embed.add_field(name = "Command to set fm account" , value = "h.fmset" , inline = False)
+        embed.add_field(name = "Command to see current track" , value = "h.fm" , inline = False)
+        embed.add_field(name = "Command to see who knows an artist" , value = "h.fmw `artist` or h.fmw aliases = h.fmwhoknows" , inline = False)
+        embed.add_field(name = "Command to see who knows an album" , value = "h.fmwka `<artist> - <albumname>`(aliases = h.fmwa , h.fmwhoknowsalbum) " , inline = False)
+        embed.add_field(name = "Command to see who knows a track" , value = "h.fmwkt `<artist> - <trackname>` (aliases = h.fmwt , h.fmwhoknowstrack)" , inline = False)
+        embed.set_thumbnail(url = 'https://lh3.googleusercontent.com/proxy/BzW7U-yNC8RjUf2SWOEzDcRxlCjXZBx7RGjiGu7QdDm7g4aKHC3tE815KW-cyut1yBF-qOKhR0r5i919Fa2nPnYqITbp-bg4Rqs_dxE8b976G3bi9SMUIC88Qkw8RIOphMD7rrIsggvBzwtcZdwTSvqVVM-vzhdeQtc')
+        embed.set_footer(text = 'requested by ' + ctx.message.author.name)
+        await ctx.send(embed = embed)
+
     @commands.command()
     async def fmset(self , ctx , *args):
         userid = str(ctx.message.author.id)
