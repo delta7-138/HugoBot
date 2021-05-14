@@ -18,7 +18,7 @@ class Lastfm(commands.Cog):
     def __init__(self , bot):
         self.bot = bot 
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
-        tmpdata = firebaseObj.get('/lastfm' , None)
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
         self.data = dict()
         for key,value in tmpdata.items(): 
             for subKey, subVal in value.items():
@@ -30,7 +30,7 @@ class Lastfm(commands.Cog):
         fmuname = args[0]
 
 
-        for key, value in data.items(): 
+        for key, value in self.data.items(): 
             if(key==userid or value==fmuname):
                 await ctx.send("User is already there")
                 return 0
@@ -49,10 +49,10 @@ class Lastfm(commands.Cog):
     @commands.command()
     async def fm(self , ctx):
         userid = str(ctx.message.author.id)
-        if(userid not in data):
+        if(userid not in self.data):
             await ctx.send("Please set your last fm account first")
         else:
-            fmuname = data[userid]
+            fmuname = self.data[userid]
             res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
             content = json.loads(res.text)
             track = content["recenttracks"]["track"][0]
@@ -76,8 +76,8 @@ class Lastfm(commands.Cog):
         image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
-            if(memberID in data):
-                uname = data[memberID]
+            if(memberID in self.data):
+                uname = self.data[memberID]
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -120,11 +120,11 @@ class Lastfm(commands.Cog):
         if isinstance(err , commands.MissingRequiredArgument):
             artist = ""
             userid = str(ctx.message.author.id)
-            if(userid not in data):
+            if(userid not in self.data):
                 await ctx.send("Please set your last fm account first")
                 return ;
             else:
-                fmuname = data[userid]
+                fmuname = self.data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 track = content["recenttracks"]["track"][0]
@@ -134,8 +134,8 @@ class Lastfm(commands.Cog):
             image = ""
             async for member in ctx.guild.fetch_members(limit = None):
                 memberID = str(member.id)
-                if(memberID in data):
-                    uname = data[memberID]
+                if(memberID in self.data):
+                    uname = self.data[memberID]
                     nick = member.name
                     unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                     parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -183,8 +183,8 @@ class Lastfm(commands.Cog):
         image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
-            if(memberID in data):
-                uname = data[memberID]
+            if(memberID in self.data):
+                uname = self.data[memberID]
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -212,11 +212,11 @@ class Lastfm(commands.Cog):
             artist = ""
             album = ""
             userid = str(ctx.message.author.id)
-            if(userid not in data):
+            if(userid not in self.data):
                 await ctx.send("Please set your last fm account first")
                 return ;
             else:
-                fmuname = data[userid]
+                fmuname = self.data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 track = content["recenttracks"]["track"][0]
@@ -227,8 +227,8 @@ class Lastfm(commands.Cog):
                 image = ""
                 async for member in ctx.guild.fetch_members(limit = None):
                     memberID = str(member.id)
-                    if(memberID in data):
-                        uname = data[memberID]
+                    if(memberID in self.data):
+                        uname = self.data[memberID]
                         nick = member.name
                         unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                         parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -260,8 +260,8 @@ class Lastfm(commands.Cog):
         image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
-            if(memberID in data):
-                uname = data[memberID]
+            if(memberID in self.data):
+                uname = self.data[memberID]
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'track' : track, 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -289,11 +289,11 @@ class Lastfm(commands.Cog):
             artist = ""
             track= ""
             userid = str(ctx.message.author.id)
-            if(userid not in data):
+            if(userid not in self.data):
                 await ctx.send("Please set your last fm account first")
                 return ;
             else:
-                fmuname = data[userid]
+                fmuname = self.data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 trackitem = content["recenttracks"]["track"][0]
@@ -304,8 +304,8 @@ class Lastfm(commands.Cog):
                 image = ""
                 async for member in ctx.guild.fetch_members(limit = None):
                     memberID = str(member.id)
-                    if(memberID in data):
-                        uname = data[memberID]
+                    if(memberID in self.data):
+                        uname = self.data[memberID]
                         nick = member.name
                         unparsedURL = {'artist' : artist , 'track' : track , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                         parsedURL = urllib.parse.urlencode(unparsedURL)
