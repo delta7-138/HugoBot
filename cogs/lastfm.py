@@ -26,7 +26,7 @@ class Lastfm(commands.Cog):
             for subKey, subVal in value.items():
                 data[subKey] = subVal
         
-        userid = discordUser.id
+        userid = str(discordUser.id)
         if(userid not in data):
             return None
         
