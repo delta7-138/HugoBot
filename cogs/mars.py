@@ -26,6 +26,26 @@ class Mars(commands.Cog):
             return 5100
 
     @commands.command()
+    async def apod(self , ctx):
+        try:
+            result = requests.get('https://api.nasa.gov/planetary/apod?api_key=' + API_TOKEN)
+            content = result.json()
+            url = ""
+            date = content["date"]
+            title = content["title"]
+            if("hdurl" in content):
+                url = content["hdurl"]
+            else:
+                url = content["url"]
+            
+            embed = discord.Embed(title = "Astronomy picture of the day",  description = "**Title** : {} \n **Date** : {} \n".format(title , date) , color = 0xffefef)
+            embed.set_image(url = url)
+            embed.set_footer(text = "requested by {}".format(ctx.message.author.name))
+            await ctx.reply(embed = embed , mention_author = True)
+        except:
+            await ctx.reply("Image not available :pensive:" , mention_author = True)
+
+    @commands.command()
     async def mars(self, ctx , *args):
         try:
             reference_args = {'o' : 'opportunity' , 'c' : 'curiosity' , 's' : 'spirit'}
