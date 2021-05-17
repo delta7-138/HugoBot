@@ -59,10 +59,10 @@ class Lastfm(commands.Cog):
         await ctx.send("User successfully added :vampire:")
 
     @commands.command()
-    async def fm(self , ctx):
-        userid = str(ctx.message.author.id)
+    async def fm(self , ctx , member : discord.Member):
+        userid = str(member.id)
         if(userid not in self.data):
-            await ctx.send("Please set your last fm account first")
+            await ctx.send("No last fm account set")
         else:
             fmuname = self.data[userid]
             res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
@@ -79,7 +79,33 @@ class Lastfm(commands.Cog):
             embed.add_field(name = "Album Name", value = trackalbum if(trackalbum!=None) else "-" , inline = False)
             embed.set_image(url = trackimg)
             await ctx.send(embed = embed)
+    
+    @fm.error
+    async def fmerror(self , ctx , err):
+        if isinstance(err , commands.MissingRequiredArgument):
+            member = ctx.message.author
+            userid = str(member.id)
+            if(userid not in self.data):
+                await ctx.send("No last fm account set")
+            else:
+                fmuname = self.data[userid]
+                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                content = json.loads(res.text)
+                track = content["recenttracks"]["track"][0]
+                trackartist = track["artist"]["#text"]
+                trackalbum = track["album"]["#text"]  
+                trackname = track["name"] 
+                trackimg = track["image"][2]["#text"]
+                print(trackname + " " + trackalbum + " " + trackartist)
+                embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
+                embed.add_field(name = "Track Name" , value = trackname  , inline = False)
+                embed.add_field(name = "Artist Name" , value = trackartist , inline = False)
+                embed.add_field(name = "Album Name", value = trackalbum if(trackalbum!=None) else "-" , inline = False)
+                embed.set_image(url = trackimg)
+                await ctx.send(embed = embed)
 
+        if isinstance(err , commands.BadArgument):
+            await ctx.reply("Wrong argument" , mention_author = True)  
 
     @commands.command(aliases = ['fmwhoknows' , 'fmwk'])
     async def fmw(self , ctx , *, args):
