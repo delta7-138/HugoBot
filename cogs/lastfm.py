@@ -19,6 +19,31 @@ class Lastfm(commands.Cog):
         self.bot = bot 
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
 
+    async def getTopArtists(self , discordUser , messageSender):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
+        
+        userid = discordUser.id
+        if(userid not in data):
+            return None
+        
+        lastfmuname = data[userid]
+        queryUname = urllib.parse.urlencode({'user' : lastfmuname})
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists' + queryUname + '&api_key=f46528b12f95981b26d35747431842bf&format=json')
+        content = res.json()
+        description = ""
+        ctr = 1
+        for i in content["artist"][:10]:
+            description+=("{}. {} - **{}**plays".format(ctr , i["name"] , i["playcount"]))
+        
+        embed = discord.Embed(title = "Top Artists for {}".format(discordUser.name) , description = description ,color = 0xff0000)
+        embed.set_footer(text = "requested by " + messageSender.name)
+        return embed
+
+
     @commands.command(aliases = ['fmh'])
     async def fmhelp(self , ctx):
         embed = discord.Embed(title = 'Hugo FM Help' , color=0x00ffea)
@@ -411,6 +436,30 @@ class Lastfm(commands.Cog):
                 embed.set_thumbnail(url = image)
                 embed.set_footer(text = "requested by " + ctx.message.author.name)
                 await ctx.send(embed = embed)    
+    
+    @commands.command(aliases = ['fmta' , 'fmtopa' , 'fmtoparts'])
+    async def fmtopartists(self , ctx , member:discord.Member):
+        discordUser = member
+        sender = ctx.message.author
+        embed = getTopArtists(self , discordUser , sender)
+        if(embed != None):
+            await ctx.send(embed = embed)
+        else:
+            await ctx.reply("Invalid user" , mention_author = True)
+
+    @fmtopartists.error
+    async def fmtaerr(self , ctx , err):
+        if isinstance(err , commands.MissingRequiredArgument):
+            member = sender = ctx.message.author
+            embed = getTopArtists(self , member , sender)
+            if(embed !=None):
+                await ctx.send(embed = embed)
+            else:
+                await ctx.reply("Invalid user" , mention_author = True)
+        
+        if isinstance(err , commands.BadArgument):
+            await ctx.reply("Invalid arguments" , mention_author = True)
+
 
 
 def setup(bot):
