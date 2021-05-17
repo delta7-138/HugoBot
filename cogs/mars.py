@@ -33,7 +33,7 @@ class Mars(commands.Cog):
             url = ""
             date = content["date"]
             title = content["title"]
-            description = content["description"]
+            description = content["explanation"]
             if("hdurl" in content):
                 url = content["hdurl"]
             else:
