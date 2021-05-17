@@ -441,7 +441,7 @@ class Lastfm(commands.Cog):
     async def fmtopartists(self , ctx , member:discord.Member):
         discordUser = member
         sender = ctx.message.author
-        embed = self.getTopArtists(self , discordUser , sender)
+        embed = self.getTopArtists(discordUser , sender)
         if(embed != None):
             await ctx.send(embed = embed)
         else:
@@ -451,7 +451,7 @@ class Lastfm(commands.Cog):
     async def fmtaerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = sender = ctx.message.author
-            embed = self.getTopArtists(self , member , sender)
+            embed = self.getTopArtists(member , sender)
             if(embed !=None):
                 await ctx.send(embed = embed)
             else:
