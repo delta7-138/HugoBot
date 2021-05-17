@@ -270,6 +270,7 @@ class Lastfm(commands.Cog):
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
         embed.set_thumbnail(url = image)
+        embed.set_footer(text = "requested by " + ctx.message.author.name)
         await ctx.send(embed = embed) 
 
     @fmwhoknowsalbum.error
@@ -319,6 +320,7 @@ class Lastfm(commands.Cog):
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
                 embed.set_thumbnail(url = image)
+                embed.set_footer(text = "requested by " + ctx.message.author.name)
                 await ctx.send(embed = embed) 
 
     @commands.command(aliases = ['fmwt' , 'fmwkt'])
@@ -357,6 +359,7 @@ class Lastfm(commands.Cog):
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
         embed.set_thumbnail(url = image)
+        embed.set_footer(text = "requested by " + ctx.message.author.name)
         await ctx.send(embed = embed) 
 
     @fmwhoknowstrack.error
@@ -406,6 +409,7 @@ class Lastfm(commands.Cog):
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
                 embed.set_thumbnail(url = image)
+                embed.set_footer(text = "requested by " + ctx.message.author.name)
                 await ctx.send(embed = embed)    
 
 
