@@ -21,10 +21,10 @@ class Lastfm(commands.Cog):
 
     async def getTopArtists(self , discordUser , messageSender):
         tmpdata = self.firebaseObj.get('/lastfm' , None)
-            data = dict()
-            for key,value in tmpdata.items(): 
-                for subKey, subVal in value.items():
-                    data[subKey] = subVal
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
         
         userid = discordUser.id
         if(userid not in data):
