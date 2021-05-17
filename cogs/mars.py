@@ -33,12 +33,13 @@ class Mars(commands.Cog):
             url = ""
             date = content["date"]
             title = content["title"]
+            description = content["description"]
             if("hdurl" in content):
                 url = content["hdurl"]
             else:
                 url = content["url"]
             
-            embed = discord.Embed(title = "Astronomy picture of the day",  description = "**Title** : {} \n **Date** : {} \n".format(title , date) , color = 0xffefef)
+            embed = discord.Embed(title = "Astronomy picture of the day",  description = "**Title** : {} \n **Date** : {} \n **Description** : {} \n".format(title , date , description) , color = 0xffefef)
             embed.set_image(url = url)
             embed.set_footer(text = "requested by {}".format(ctx.message.author.name))
             await ctx.reply(embed = embed , mention_author = True)
