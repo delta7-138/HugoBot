@@ -32,14 +32,18 @@ class Lastfm(commands.Cog):
         
         lastfmuname = data[userid]
         queryUname = urllib.parse.urlencode({'user' : lastfmuname})
-        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists' + queryUname + '&api_key=f46528b12f95981b26d35747431842bf&format=json')
+        print(queryUname)
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&api_key=f46528b12f95981b26d35747431842bf&format=json')
         content = res.json()
+        
         description = ""
         ctr = 1
         for i in content["topartists"]["artist"][:10]:
-            description+=("{}. {} - **{}**plays".format(ctr , i["name"] , i["playcount"]))
+            description+=("{}. {} - **{}** plays \n ".format(ctr , i["name"] , i["playcount"]))
+            ctr+=1
         
-        embed = discord.Embed(title = "Top Artists for {}".format(discordUser.name) , description = description ,color = 0xff0000)
+        embed = discord.Embed(title = "Top Artists for {}".format(discordUser.name) , description = description ,color = 0x27f37b,url = "https://last.fm/user/" + lastfmuname)
+        embed.set_thumbnail(url = discordUser.avatar_url)
         embed.set_footer(text = "requested by " + messageSender.name)
         return embed
 
@@ -450,8 +454,8 @@ class Lastfm(commands.Cog):
     @fmtopartists.error
     async def fmtaerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            member = sender = ctx.message.author
-            embed = await self.getTopArtists(member , sender)
+            member = ctx.message.author
+            embed = await self.getTopArtists(member , member)
             if(embed !=None):
                 await ctx.send(embed = embed)
             else:
