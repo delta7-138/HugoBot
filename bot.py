@@ -26,7 +26,7 @@ API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 client = commands.Bot(command_prefix = 'h.')
-cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc" , "cogs.mars"]
+cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc" , "cogs.mars" , "cogs.lastfm"]
 for cog in cogs:
     client.load_extension(cog)
 client.remove_command('help')
@@ -232,76 +232,6 @@ async def shoegazeimage(ctx , *args):
         await ctx.send(file = fil , embed = embed) 
     #except:
     #   await ctx.send("invalid url :pensive:")
-
-@client.command()
-async def fmset(ctx , *args):
-    userid = str(ctx.message.author.id)
-    fmuname = args[0]
-
-
-    for key, value in data.items(): 
-          if(value["user_id"]==userid or value["fmuname"]==fmuname):
-              await ctx.send("User is already there")
-              return 0
-          else:
-              res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
-              content = json.loads(res.text)
-              if("message" in content and content["message"]=="User not found"):
-                  await ctx.send("User not found :(")
-                  return 0
-
-    lkeys = list(data.keys())
-    length = len(lkeys)
-    tmp = {userid : fmuname}
-    result = firebaseObj.post('/lastfm' , tmp)
-    print(result)
-    await ctx.send("User successfully added")
-
-@client.command()
-async def fmw(ctx , *, args):
-    artist = args
-    leaderBoard = dict()
-    image = ""
-    async for member in ctx.guild.fetch_members(limit = None):
-        memberID = str(member.id)
-        if(memberID in data):
-            uname = data[memberID]    
-            nick = str(member.name)
-            unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-            parsedURL = urllib.parse.urlencode(unparsedURL)
-            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
-            content = json.loads(res2.text)
-            playCount = content['artist']['stats']['userplaycount']
-            image = content['artist']['image'][1]['#text']
-            if(playCount!='0'):
-                leaderBoard[nick] = int(playCount)
-        
-    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-    labels = []
-    values = []
-    for x,y in leaderBoard:
-        labels.append(x)
-        values.append(y)
-
-    x = np.arange(len(labels))
-    width = 0.35
-    fig, ax = plt.subplots()
-    rects1 = ax.bar(x - width/4, values, width, label='Men')
-    ax.set_ylabel('Play Count for ' + artist)
-    ax.set_title('Who knows ' + artist)
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.bar_label(rects1, padding=3)
-    fig.tight_layout()
-    buffer = BytesIO()
-    plt.savefig(buffer , format = "png")
-    buffer.seek(0)
-    plt.close()
-    fil = discord.File(filename = 'whoknows.png' , fp = buffer)
-    # embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
-    # for key,value in leaderBoard:
-    #     embed.add_field(name = key, value = value , inline = False)
-    await ctx.send(file = fil)
 
 @client.command(aliases = ['sol'])
 async def standardofliving(ctx , * , args):
