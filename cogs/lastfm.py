@@ -36,7 +36,7 @@ class Lastfm(commands.Cog):
         content = res.json()
         description = ""
         ctr = 1
-        for i in content["artist"][:10]:
+        for i in content["topartists"]["artist"][:10]:
             description+=("{}. {} - **{}**plays".format(ctr , i["name"] , i["playcount"]))
         
         embed = discord.Embed(title = "Top Artists for {}".format(discordUser.name) , description = description ,color = 0xff0000)
