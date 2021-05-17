@@ -18,11 +18,6 @@ class Lastfm(commands.Cog):
     def __init__(self , bot):
         self.bot = bot 
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
-        tmpdata = self.firebaseObj.get('/lastfm' , None)
-        self.data = dict()
-        for key,value in tmpdata.items(): 
-            for subKey, subVal in value.items():
-                self.data[subKey] = subVal
 
     @commands.command(aliases = ['fmh'])
     async def fmhelp(self , ctx):
@@ -38,11 +33,17 @@ class Lastfm(commands.Cog):
 
     @commands.command()
     async def fmset(self , ctx , *args):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
+
         userid = str(ctx.message.author.id)
         fmuname = args[0]
 
 
-        for key, value in self.data.items(): 
+        for key, value in data.items(): 
             if(key==userid or value==fmuname):
                 await ctx.send("User is already there")
                 return 0
@@ -53,18 +54,24 @@ class Lastfm(commands.Cog):
                     await ctx.send("User not found :(")
                     return 0
 
-        self.data[userid] = fmuname
+        data[userid] = fmuname
         tmp = {userid : fmuname}
         self.firebaseObj.post('/lastfm' , tmp)
         await ctx.send("User successfully added :vampire:")
 
     @commands.command()
     async def fm(self , ctx , member : discord.Member):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
+                
         userid = str(member.id)
-        if(userid not in self.data):
+        if(userid not in data):
             await ctx.send("No last fm account set")
         else:
-            fmuname = self.data[userid]
+            fmuname = data[userid]
             res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
             content = json.loads(res.text)
             track = content["recenttracks"]["track"][0]
@@ -83,12 +90,18 @@ class Lastfm(commands.Cog):
     @fm.error
     async def fmerror(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
+                    
             member = ctx.message.author
             userid = str(member.id)
-            if(userid not in self.data):
+            if(userid not in data):
                 await ctx.send("No last fm account set")
             else:
-                fmuname = self.data[userid]
+                fmuname = data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 track = content["recenttracks"]["track"][0]
@@ -109,13 +122,18 @@ class Lastfm(commands.Cog):
 
     @commands.command(aliases = ['fmwhoknows' , 'fmwk'])
     async def fmw(self , ctx , *, args):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
         artist = args
         leaderBoard = dict()
         image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
-            if(memberID in self.data):
-                uname = self.data[memberID]
+            if(memberID in data):
+                uname = data[memberID]
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -156,13 +174,18 @@ class Lastfm(commands.Cog):
     @fmw.error
     async def fmwerror(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
             artist = ""
             userid = str(ctx.message.author.id)
-            if(userid not in self.data):
+            if(userid not in data):
                 await ctx.send("Please set your last fm account first")
                 return ;
             else:
-                fmuname = self.data[userid]
+                fmuname = data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 track = content["recenttracks"]["track"][0]
@@ -172,8 +195,8 @@ class Lastfm(commands.Cog):
             image = ""
             async for member in ctx.guild.fetch_members(limit = None):
                 memberID = str(member.id)
-                if(memberID in self.data):
-                    uname = self.data[memberID]
+                if(memberID in data):
+                    uname = data[memberID]
                     nick = member.name
                     unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                     parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -213,6 +236,11 @@ class Lastfm(commands.Cog):
 
     @commands.command(aliases = ['fmwka' , 'fmwa'])
     async def fmwhoknowsalbum(self , ctx , * , args):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
         artistAlbum = args.split("-")
         artistAlbum = [i.strip() for i in artistAlbum]
         album = artistAlbum[1]
@@ -221,8 +249,8 @@ class Lastfm(commands.Cog):
         image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
-            if(memberID in self.data):
-                uname = self.data[memberID]
+            if(memberID in data):
+                uname = data[memberID]
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -247,14 +275,19 @@ class Lastfm(commands.Cog):
     @fmwhoknowsalbum.error
     async def fmwhoknowsalbumerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
             artist = ""
             album = ""
             userid = str(ctx.message.author.id)
-            if(userid not in self.data):
+            if(userid not in data):
                 await ctx.send("Please set your last fm account first")
                 return ;
             else:
-                fmuname = self.data[userid]
+                fmuname = data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 track = content["recenttracks"]["track"][0]
@@ -265,8 +298,8 @@ class Lastfm(commands.Cog):
                 image = ""
                 async for member in ctx.guild.fetch_members(limit = None):
                     memberID = str(member.id)
-                    if(memberID in self.data):
-                        uname = self.data[memberID]
+                    if(memberID in data):
+                        uname = data[memberID]
                         nick = member.name
                         unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                         parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -290,6 +323,11 @@ class Lastfm(commands.Cog):
 
     @commands.command(aliases = ['fmwt' , 'fmwkt'])
     async def fmwhoknowstrack(self , ctx , * , args):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
         artistTrack = args.split("-")
         artistTrack = [i.strip() for i in artistTrack]
         track = artistTrack[1]
@@ -298,8 +336,8 @@ class Lastfm(commands.Cog):
         image = ""
         async for member in ctx.guild.fetch_members(limit = None):
             memberID = str(member.id)
-            if(memberID in self.data):
-                uname = self.data[memberID]
+            if(memberID in data):
+                uname = data[memberID]
                 nick = member.name
                 unparsedURL = {'artist' : artist , 'track' : track, 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                 parsedURL = urllib.parse.urlencode(unparsedURL)
@@ -324,14 +362,19 @@ class Lastfm(commands.Cog):
     @fmwhoknowstrack.error
     async def fmwhoknowstrackerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
             artist = ""
             track= ""
             userid = str(ctx.message.author.id)
-            if(userid not in self.data):
+            if(userid not in data):
                 await ctx.send("Please set your last fm account first")
                 return ;
             else:
-                fmuname = self.data[userid]
+                fmuname = data[userid]
                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
                 content = json.loads(res.text)
                 trackitem = content["recenttracks"]["track"][0]
@@ -342,8 +385,8 @@ class Lastfm(commands.Cog):
                 image = ""
                 async for member in ctx.guild.fetch_members(limit = None):
                     memberID = str(member.id)
-                    if(memberID in self.data):
-                        uname = self.data[memberID]
+                    if(memberID in data):
+                        uname = data[memberID]
                         nick = member.name
                         unparsedURL = {'artist' : artist , 'track' : track , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
                         parsedURL = urllib.parse.urlencode(unparsedURL)
