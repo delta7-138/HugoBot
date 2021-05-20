@@ -47,7 +47,10 @@ class Lastfm(commands.Cog):
         embed.set_footer(text = "requested by " + messageSender.name)
         return embed
 
-    async def getTopTracks(self , discordUser , messageSender):
+    async def getTopAlbumsTracks(self , discordUser , messageSender , flag):
+        tag = "track"
+        if(flag==1):
+            tag = "album"
         tmpdata = self.firebaseObj.get('/lastfm' , None)
         data = dict()
         for key,value in tmpdata.items(): 
@@ -61,16 +64,16 @@ class Lastfm(commands.Cog):
         lastfmuname = data[userid]
         queryUname = urllib.parse.urlencode({'user' : lastfmuname})
         print(queryUname)
-        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettop' + tag + 's&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
         content = res.json()
         
         description = ""
         ctr = 1
-        for i in content["toptracks"]["track"][:10]:
+        for i in content["top" + tag + "s"][tag][:10]:
             description+=("{}. [{} : {}]({}) - **{}** plays \n ".format(ctr ,i["artist"]["name"] ,  i["name"] , i["url"] ,  i["playcount"]))
             ctr+=1
         
-        embed = discord.Embed(title = "Top Tracks for {}".format(discordUser.name) , description = description ,color = 0x27f37b,url = "https://last.fm/user/" + lastfmuname)
+        embed = discord.Embed(title = "Top {}s for {}".format(tag , discordUser.name) , description = description ,color = 0x27f37b,url = "https://last.fm/user/" + lastfmuname)
         embed.set_thumbnail(url = discordUser.avatar_url)
         embed.set_footer(text = "requested by " + messageSender.name)
         return embed
@@ -321,9 +324,8 @@ class Lastfm(commands.Cog):
         description = ""
         ctr = 0
         for key,value in leaderBoard:
-            if(value!=0):
-                description = description + str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
-                ctr+=1
+            ctr+=1
+            description = description + str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
         embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
         embed.set_thumbnail(url = image)
@@ -372,9 +374,8 @@ class Lastfm(commands.Cog):
                 description = ""
                 ctr = 0
                 for key,value in leaderBoard:
-                    if(value != 0):
-                        ctr+=1
-                        description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
+                    ctr+=1
+                    description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
                 embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
                 embed.set_thumbnail(url = image)
@@ -497,7 +498,7 @@ class Lastfm(commands.Cog):
     async def fmtoptracks(self , ctx , member:discord.Member):
         discordUser = member
         sender = ctx.message.author
-        embed = await self.getTopTracks(discordUser , sender)
+        embed = await self.getTopAlbumsTracks(discordUser , sender , 0)
         if(embed != None):
             await ctx.send(embed = embed)
         else:
@@ -507,7 +508,30 @@ class Lastfm(commands.Cog):
     async def fmtterr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
-            embed = await self.getTopTracks(member , member)
+            embed = await self.getTopAlbumsTracks(member , member , 0)
+            if(embed !=None):
+                await ctx.send(embed = embed)
+            else:
+                await ctx.reply("Invalid user" , mention_author = True)
+        
+        if isinstance(err , commands.BadArgument):
+            await ctx.reply("Invalid arguments" , mention_author = True)
+    
+    @commands.command(aliases = ['fmtal' , 'fmtopal' , 'fmtalbums'])
+    async def fmtopalbums(self , ctx , member:discord.Member):
+        discordUser = member
+        sender = ctx.message.author
+        embed = await self.getTopAlbumsTracks(discordUser , sender , 1)
+        if(embed != None):
+            await ctx.send(embed = embed)
+        else:
+            await ctx.reply("Invalid user" , mention_author = True)
+
+    @fmtopalbums.error
+    async def fmtterr(self , ctx , err):
+        if isinstance(err , commands.MissingRequiredArgument):
+            member = ctx.message.author
+            embed = await self.getTopAlbumsTracks(member , member , 1)
             if(embed !=None):
                 await ctx.send(embed = embed)
             else:
