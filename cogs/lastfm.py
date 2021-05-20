@@ -33,11 +33,7 @@ class Lastfm(commands.Cog):
         lastfmuname = data[userid]
         queryUname = urllib.parse.urlencode({'user' : lastfmuname})
         print(queryUname)
-<<<<<<< HEAD
         res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
-=======
-        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
->>>>>>> 5b81918096b83a5c968486d9fae4483038b6912a
         content = res.json()
         
         description = ""
