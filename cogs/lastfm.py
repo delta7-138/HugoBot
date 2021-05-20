@@ -33,13 +33,13 @@ class Lastfm(commands.Cog):
         lastfmuname = data[userid]
         queryUname = urllib.parse.urlencode({'user' : lastfmuname})
         print(queryUname)
-        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&api_key=f46528b12f95981b26d35747431842bf&format=json')
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
         content = res.json()
         
         description = ""
         ctr = 1
         for i in content["topartists"]["artist"][:10]:
-            description+=("{}. {} - **{}** plays \n ".format(ctr , i["name"] , i["playcount"]))
+            description+=("{}. [{}]({}) - **{}** plays \n ".format(ctr , i["name"] , i["url"] , i["playcount"]))
             ctr+=1
         
         embed = discord.Embed(title = "Top Artists for {}".format(discordUser.name) , description = description ,color = 0x27f37b,url = "https://last.fm/user/" + lastfmuname)
@@ -47,6 +47,33 @@ class Lastfm(commands.Cog):
         embed.set_footer(text = "requested by " + messageSender.name)
         return embed
 
+    async def getTopTracks(self , discordUser , messageSender):
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                data[subKey] = subVal
+        
+        userid = str(discordUser.id)
+        if(userid not in data):
+            return None
+        
+        lastfmuname = data[userid]
+        queryUname = urllib.parse.urlencode({'user' : lastfmuname})
+        print(queryUname)
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
+        content = res.json()
+        
+        description = ""
+        ctr = 1
+        for i in content["toptracks"]["track"][:10]:
+            description+=("{}. [{} : {}]({}) - **{}** plays \n ".format(ctr ,i["artist"]["name"] ,  i["name"] , i["url"] ,  i["playcount"]))
+            ctr+=1
+        
+        embed = discord.Embed(title = "Top Tracks for {}".format(discordUser.name) , description = description ,color = 0x27f37b,url = "https://last.fm/user/" + lastfmuname)
+        embed.set_thumbnail(url = discordUser.avatar_url)
+        embed.set_footer(text = "requested by " + messageSender.name)
+        return embed
 
     @commands.command(aliases = ['fmh'])
     async def fmhelp(self , ctx):
@@ -464,7 +491,28 @@ class Lastfm(commands.Cog):
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Invalid arguments" , mention_author = True)
 
+    @commands.command(aliases = ['fmtt' , 'fmtoptr' , 'fmttracks'])
+    async def fmtoptracks(self , ctx , member:discord.Member):
+        discordUser = member
+        sender = ctx.message.author
+        embed = await self.getTopTracks(discordUser , sender)
+        if(embed != None):
+            await ctx.send(embed = embed)
+        else:
+            await ctx.reply("Invalid user" , mention_author = True)
 
+    @fmtoptracks.error
+    async def fmtterr(self , ctx , err):
+        if isinstance(err , commands.MissingRequiredArgument):
+            member = ctx.message.author
+            embed = await self.getTopTracks(member , member)
+            if(embed !=None):
+                await ctx.send(embed = embed)
+            else:
+                await ctx.reply("Invalid user" , mention_author = True)
+        
+        if isinstance(err , commands.BadArgument):
+            await ctx.reply("Invalid arguments" , mention_author = True)
 
 def setup(bot):
     bot.add_cog(Lastfm(bot))
