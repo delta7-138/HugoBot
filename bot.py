@@ -72,6 +72,7 @@ async def on_message(message):
     rand_response = responses[random.randint(0 , 5)]
     if client.user.mention in message.content.split():
         await message.channel.send(response)
+    await bot.process_commands(message)
 
 #help commands
 @client.command()
