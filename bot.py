@@ -66,13 +66,6 @@ async def on_ready():
     await client.change_presence(activity=discord.Game(name="my life"))
     print('We have logged in as {0.user}'.format(client))
 
-@client.event
-async def on_message(message):
-    responses = ['fuck off' , 'kaam kar apna' , 'let me live ffs' , 'am I a joke to you' , 'stop pinging me' , 'get a life']
-    rand_response = responses[random.randint(0 , 5)]
-    if client.user.mention in message.content.split():
-        await message.channel.send(response)
-    await client.process_commands(message)
 
 #help commands
 @client.command()
