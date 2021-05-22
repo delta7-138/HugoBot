@@ -71,7 +71,7 @@ class Shoegaze(commands.Cog):
             fil = discord.File('res.jpg')
             await ctx.send(embed = output[1] , file = fil)
         else:
-            awat ctx.send("Invalid color input")
+            await ctx.send("Invalid color input")
     
     @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases = ['sgi'])
