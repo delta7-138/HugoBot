@@ -26,7 +26,7 @@ class Shoegaze(commands.Cog):
         return im
 
     async def getShoegazedImage(self , imgurl , color):
-        if(color!='p' or color!='g' or color!='b'):
+        if(color!='p' and color!='g' and color!='b'):
             return None
         colorefs = {'b' : (255 , 0 , 0) , 'p' : (222 , 18 , 201) , 'g' : (0 , 255 , 0)}
         embedrefs = {'b' : 0x0000ff , 'p' : 0xc912de , 'g' : 0x00ff00}
