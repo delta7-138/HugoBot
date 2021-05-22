@@ -28,7 +28,7 @@ class Shoegaze(commands.Cog):
     async def getShoegazedImage(self , imgurl , color):
         if(color!='p' and color!='g' and color!='b'):
             return None
-        colorefs = {'b' : (173 27 , 28) , 'p' : (127 , 1 , 255) , 'g' : (0 , 255 , 0)}
+        colorefs = {'b' : (173, 27 , 28) , 'p' : (127 , 1 , 255) , 'g' : (0 , 255 , 0)}
         embedrefs = {'b' : 0x0000ff , 'p' : 0xc912de , 'g' : 0x00ff00}
         im = Image.open(requests.get(imgurl , stream = True).raw)
         im.save('inter.png')
