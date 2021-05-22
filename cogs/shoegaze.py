@@ -62,12 +62,20 @@ class Shoegaze(commands.Cog):
         fil = discord.File('res.jpg')
         await ctx.send(embed = output[1] , file = fil)
     
+    @commands.cooldown(1, 10, commands.BucketType.user)
     @commands.command(aliases = ['sgi'])
     async def shoegazeimage(self , ctx , url , color):
         output = await self.getShoegazedImage(url , color)
         await ctx.send(file = output[0] , embed = output[1])
 
+    @shoegazeimage.error
+    async def errorsgi(self  , ctx , err):
+        if isinstance(err , commands.CommandOnCooldown):
+            await ctx.send("Cooldown for a while send in {:.2f}s".format(err.retry_after))
+
+    
     @commands.command(aliases = ['sgid'])
+    @commands.cooldown(1, 10, commands.BucketType.user)
     async def shoegazeimagedistort(self , ctx , url , color):
         output = await self.getShoegazedImage(url , color)
         im = Image.open("res.jpg")
@@ -75,7 +83,12 @@ class Shoegaze(commands.Cog):
         res.save('res.jpg')
         fil = discord.File('res.jpg')
         await ctx.send(embed = output[1] , file = fil)
-        
+
+    @shoegazeimagedistort.error
+    async def errorsgid(self  , ctx , err):
+        if isinstance(err , commands.CommandOnCooldown):
+            await ctx.send("Cooldown for a while send in {:.2f}s".format(err.retry_after))
+
 
 def setup(bot):
     bot.add_cog(Shoegaze(bot))
