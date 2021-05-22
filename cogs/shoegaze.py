@@ -73,7 +73,7 @@ class Shoegaze(commands.Cog):
         else:
             await ctx.send("Invalid color input")
     
-    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.cooldown(1, 30, commands.BucketType.user)
     @commands.command(aliases = ['sgi'])
     async def shoegazeimage(self , ctx , url , color):
         output = await self.getShoegazedImage(url , color)
@@ -89,7 +89,7 @@ class Shoegaze(commands.Cog):
 
     
     @commands.command(aliases = ['sgid'])
-    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.cooldown(1, 30, commands.BucketType.user)
     async def shoegazeimagedistort(self , ctx , url , color):
         output = await self.getShoegazedImage(url , color)
         if(output!=None):
