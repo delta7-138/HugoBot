@@ -35,7 +35,6 @@ class Shoegaze(commands.Cog):
             if(color.startswith("0x")==False or len(color)!=8):
                 return None
             else:
-                color = lower(color)
                 blue = int(color[6:8] , 16)
                 green = int(color[4:6] , 16)
                 red = int(color[2:4] , 16)
