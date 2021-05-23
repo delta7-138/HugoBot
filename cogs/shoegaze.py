@@ -48,10 +48,10 @@ class Shoegaze(commands.Cog):
         image = 'inter.png'
         initimg = cv.imread(image , 1)
 
-        restuple = tuple(tmp)
+        restuple = tuple(temp)
         if(flag):
             restuple = colorefs[color]
-            
+
         rows , cols , res = initimg.shape
         refimg = np.full((rows , cols , res) , restuple, np.uint8)
         finalimg = cv.addWeighted(initimg , 1 , refimg , 0.6 , 0)
