@@ -52,7 +52,7 @@ class Shoegaze(commands.Cog):
         refimg = np.full((rows , cols , res) , colorefs[color] if flag else temp , np.uint8)
         finalimg = cv.addWeighted(initimg , 1 , refimg , 0.6 , 0)
         cv.imwrite('res.jpg', finalimg)
-        embed = discord.Embed(title = "Shoegazed image" , color = embedrefs[color] if flag else 0xff00ff)
+        embed = discord.Embed(title = "Shoegazed image")
         fil = discord.File('res.jpg')
         embed.set_image(url = 'attachment://res.jpg')
         return (fil , embed)
