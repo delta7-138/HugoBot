@@ -31,7 +31,7 @@ class Shoegaze(commands.Cog):
             flag = True
         
         temp = list()
-        if(flag==False):
+        if(flag==True):
             if(color.startsWith("0x")==False or len(color)!=7):
                 return None
             else:
@@ -49,7 +49,7 @@ class Shoegaze(commands.Cog):
         initimg = cv.imread(image , 1)
 
         restuple = tuple(temp)
-        if(flag):
+        if(flag==False):
             restuple = colorefs[color]
 
         rows , cols , res = initimg.shape
