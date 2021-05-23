@@ -32,7 +32,7 @@ class Shoegaze(commands.Cog):
         
         temp = list()
         if(flag==True):
-            if(color.startsWith("0x")==False or len(color)!=7):
+            if(color.startswith("0x")==False or len(color)!=7):
                 return None
             else:
                 color = lower(color)
