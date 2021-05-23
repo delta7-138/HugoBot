@@ -44,6 +44,14 @@ class Shoegaze(commands.Cog):
         embed.set_image(url = 'attachment://res.jpg')
         return (fil , embed)
 
+    @commands.command(aliases =['sga'])
+    async def shoegazeavatar(self , ctx , member:discord.Member , color):
+        output = await self.getShoegazedImage(member.avatar_url , color) 
+        if(output!=None):
+            await ctx.send(file = output[0] , embed = output[1])
+        else:
+            await ctx.send("invalid color input") 
+
     @commands.command(aliases = ['sg' , 'sgc'])
     async def shoegazecolor(self , ctx , color):
         output = await self.getShoegazedImage(ctx.message.author.avatar_url , color)
