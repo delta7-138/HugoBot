@@ -26,8 +26,21 @@ class Shoegaze(commands.Cog):
         return im
 
     async def getShoegazedImage(self , imgurl , color):
+        flag = False
         if(color!='p' and color!='g' and color!='b'):
-            return None
+            flag = True
+        
+        temp = list()
+        if(flag==False):
+            if(color.startsWith("0x")==False or len(color)!=7):
+                return None
+            else:
+                color = lower(color)
+                blue = int(color[6:8] , 16)
+                green = int(color[4:6] , 16)
+                red = int(color[2:4] , 16)
+                temp = [blue , green , red]
+        
         colorefs = {'b' : (173, 27 , 28) , 'p' : (127 , 1 , 255) , 'g' : (0 , 255 , 0)}
         embedrefs = {'b' : 0x0000ff , 'p' : 0xc912de , 'g' : 0x00ff00}
         im = Image.open(requests.get(imgurl , stream = True).raw)
@@ -36,10 +49,10 @@ class Shoegaze(commands.Cog):
         initimg = cv.imread(image , 1)
 
         rows , cols , res = initimg.shape
-        refimg = np.full((rows , cols , res) , colorefs[color] , np.uint8)
+        refimg = np.full((rows , cols , res) , colorefs[color] if flag else temp , np.uint8)
         finalimg = cv.addWeighted(initimg , 1 , refimg , 0.6 , 0)
         cv.imwrite('res.jpg', finalimg)
-        embed = discord.Embed(title = "Shoegazed image" , color = embedrefs[color])
+        embed = discord.Embed(title = "Shoegazed image" , color = embedrefs[color] if flag else color)
         fil = discord.File('res.jpg')
         embed.set_image(url = 'attachment://res.jpg')
         return (fil , embed)
@@ -113,7 +126,6 @@ class Shoegaze(commands.Cog):
     async def errorsgid(self  , ctx , err):
         if isinstance(err , commands.CommandOnCooldown):
             await ctx.send("Cooldown for a while send in {:.2f}s".format(err.retry_after))
-
 
 def setup(bot):
     bot.add_cog(Shoegaze(bot))
