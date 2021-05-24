@@ -31,7 +31,7 @@ class Shoegaze(commands.Cog):
         image = 'interinv.png'
         initimg = cv.imread(image , 0)
         initimg = cv.bitwise_not(initimg)
-        cv.imwrite('inv.jpg', finalimg)
+        cv.imwrite('inv.jpg', initimg)
         embed = discord.Embed(title = "Death Grips")
         fil = discord.File('inv.jpg')
         embed.set_image(url = 'attachment://inv.jpg')
