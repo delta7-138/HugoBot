@@ -60,6 +60,18 @@ class Shoegaze(commands.Cog):
         embed.set_image(url = 'attachment://res.jpg')
         return (fil , embed)
 
+    @commands.command(aliases = ['sghelp'])
+    async def shoegazehelp(self , ctx):
+        embed = discord.Embed(title = "Shoegaze Help" , description = "_preset colors are 'p' 'g' and 'b' for pink green and blue respectively_" , color = 0xff00ff)
+        embed.add_field(name = "Shoegaze your avatar" , value = "h.sg <color hex>" , inline = False)
+        embed.add_field(name = "Shoegaze someone else's avatar" , value = "h.sga <member mention> <color>" , inline = False)
+        embed.add_field(name = "Shoegaze your avatar with distortion" , value = "h.sgd <color hex>" , inline = False)
+        embed.add_field(name = "Shoegaze an image with url" , value = "h.sgi <url> <color hex>" , inline = False)
+        embed.add_field(name = "Shoegaze an image with url and add distortion" , value = "h.sgid <url> <color hex>" , inline = False)
+        embed.set_footer(text = "requested by {}".format(ctx.message.author.name))
+        embed.set_thumbnail(url = "https://media.discordapp.net/attachments/737538280589099039/846307664862117898/cover-My_Bloody_Valentine_Loveless.png")
+        await ctx.reply(embed = embed , mention_author = True)
+
     @commands.command(aliases =['sga'])
     async def shoegazeavatar(self , ctx , member:discord.Member , color):
         output = await self.getShoegazedImage(member.avatar_url , color) 
