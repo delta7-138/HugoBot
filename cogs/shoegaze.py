@@ -84,6 +84,11 @@ class Shoegaze(commands.Cog):
             output = await self.invert(member.avatar_url)
             await ctx.send(embed = output[1] , file = output[0])
 
+    @commands.command(aliases = ['iurl' , 'iu'])
+    async def inverturl(self, ctx , url):
+        output = await self.invert(url)
+        await ctx.send(embed = output[1] , file = output[0])
+
     @commands.command(aliases = ['sghelp'])
     async def shoegazehelp(self , ctx):
         embed = discord.Embed(title = "Shoegaze Help" , description = "_preset colors are 'p' 'g' and 'b' for pink green and blue respectively_" , color = 0xff00ff)
