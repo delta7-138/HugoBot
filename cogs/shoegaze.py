@@ -25,6 +25,14 @@ class Shoegaze(commands.Cog):
                     im.putpixel((i , j) , tuple(tmp))    
         return im
 
+    async def invert(self , imgurl):
+        im = Image.open(requests.get(imgurl , stream = True).raw)
+        im.save('inter.png')
+        image = 'inter.png'
+        initimg = cv.imread(image , 0)
+        initimg = cv.bitwise_not(initimg)
+        cv.imwrite('inv.jpg', finalimg)
+
     async def getShoegazedImage(self , imgurl , color):
         flag = False
         if(color!='p' and color!='g' and color!='b'):
@@ -59,6 +67,24 @@ class Shoegaze(commands.Cog):
         fil = discord.File('res.jpg')
         embed.set_image(url = 'attachment://res.jpg')
         return (fil , embed)
+
+    @commands.command(aliases = ['imginv' , 'iminv' , 'i'])
+    async def invertimage(self , ctx , member : discord.Member):
+        self.invert(member.avatar_url)
+        embed = discord.Embed(title = "Death Grips")
+        fil = discord.File('inv.jpg')
+        embed.set_image(url = 'attachment://inv.jpg')
+        await ctx.send(embed = embed , file = fil)
+
+    @invertimage.error
+    async def errinv(self , ctx , err):
+        if isinstance(err , commands.MissingRequiredArgument):
+            member = ctx.message.author
+            self.invert(member.avatar_url)
+            embed = discord.Embed(title = "Death Grips")
+            fil = discord.File('inv.jpg')
+            embed.set_image(url = 'attachment://inv.jpg')
+            await ctx.send(embed = embed , file = fil)
 
     @commands.command(aliases = ['sghelp'])
     async def shoegazehelp(self , ctx):
