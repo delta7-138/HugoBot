@@ -617,7 +617,7 @@ class Lastfm(commands.Cog):
                 content = json.loads(res.text)
                 track = content["recenttracks"]["track"][0]
                 trackartist = track["artist"]["#text"]
-                artist = trackoutput["trackartist"]
+                artist = trackartist
                 output = await self.getArtistInfo(artist)
                 if(output==None):
                     await ctx.send("Invalid artist")
