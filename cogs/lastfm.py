@@ -600,17 +600,29 @@ class Lastfm(commands.Cog):
     @commands.command(aliases = ['fma' , 'fmainfo'])
     async def fmartistinfo(self , ctx , *args):
         if(args==()):
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
+                    
             member = ctx.message.author
-            trackoutput = await self.getCurrentTrack(member , member)
-            if(trackoutput==None):
-                await ctx.send("Set your last fm account first")
+            userid = str(member.id)
+            if(userid not in data):
+                await ctx.send("No last fm account set")
                 return ;
-            artist = trackoutput["trackartist"]
-            output = await self.getArtistInfo(artist)
-            if(output==None):
-                await ctx.send("Invalid artist")
             else:
-                await ctx.send(embed = output)
+                fmuname = data[userid]
+                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                content = json.loads(res.text)
+                track = content["recenttracks"]["track"][0]
+                trackartist = track["artist"]["#text"]
+                artist = trackoutput["trackartist"]
+                output = await self.getArtistInfo(artist)
+                if(output==None):
+                    await ctx.send("Invalid artist")
+                else:
+                    await ctx.send(embed = output)
         else:
             artist = args
             artistname = ""
