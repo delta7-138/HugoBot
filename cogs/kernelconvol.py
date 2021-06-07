@@ -90,7 +90,7 @@ def better_send(ctx, content=None, embed=None, file=None):
         return ctx.send("Coudn't send the message.. something went wrong!!")
 
 
-def downloadFileFromUrl(something: str, name: str)->str:
+async def downloadFileFromUrl(something: str, name: str)->str:
     response = requests.get(something, stream=True)
     with open(f'{name}.png', 'wb') as out_file:
         shutil.copyfileobj(response.raw, out_file)
