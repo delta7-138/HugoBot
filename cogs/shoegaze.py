@@ -7,6 +7,7 @@ import random
 from PIL import Image
 from math import *
 from discord.ext import commands
+from .kernelconvol import *
 
 class Shoegaze(commands.Cog):
     def __init__(self , bot):
@@ -124,6 +125,15 @@ class Shoegaze(commands.Cog):
             await ctx.send(embed = output[1] , file = fil)
         else:
             await ctx.send("Invalid color input")
+
+    @commands.command(aliases= ['scov'])
+    async def shoegazeconvolution(self,ctx,color):
+        attachment_url = ctx.message.attachments[0].url
+        output = await self.getShoegazedImage(attachment_url , color)
+        imag = np.asarray(Image.open(output).resize((512,512),Image.BICUBIC))
+        conv_img = await instance_convolve(imag,gaussian_kernel(5,5,1))
+        Image.fromarray(conv_img).save("res.jpg")
+        await ctx.send(file = open("res.jpg",'rb') , embed = output[1])
 
     @shoegazeimagedistort.error
     async def errorsgid(self  , ctx , err):
