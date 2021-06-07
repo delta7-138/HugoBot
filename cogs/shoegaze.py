@@ -189,11 +189,12 @@ class Shoegaze(commands.Cog):
             except:
                 await better_send(ctx, "I think something went wrong!")
                 return None
-        output = downloadFileFromUrl(attachment_url,filname) + '.png'
+        output = Image.open(await downloadFileFromUrl(attachment_url,filname) + '.png')
         luminosity = process_image_to_numpy_array(output)
-        conv_img = await instance_convolve(luminosity,EDGE_DETECT_KERNEL) # <---- maybe try adding a argument which can switch between kernel?
-        Image.fromarray(conv_img).save("res.jpg")
-        await ctx.send(file = open("res.jpg",'rb') , embed = output[1])
+        conv_img = instance_convolve(luminosity,EDGE_DETECT_KERNEL) # <---- maybe try adding a argument which can switch between kernel?
+        Image.fromarray(conv_img).convert('L').save("res.jpg")
+        fil = discord.File('res.jpg')
+        await ctx.send(file = fil)
         os.remove(filname + '.png')
 
     @shoegazeimagedistort.error
