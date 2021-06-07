@@ -8,3 +8,5 @@ virtualenv
 requests
 git+https://github.com/ozgur/python-firebase
 opencv-python
+lyricsgenius
+pygicord
