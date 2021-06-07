@@ -1,4 +1,5 @@
 import discord
+from numpy.core.numeric import outer
 import cv2 as cv
 import numpy as np
 import urllib
@@ -8,6 +9,7 @@ from PIL import Image
 from math import *
 from discord.ext import commands
 from .kernelconvol import *
+
 
 class Shoegaze(commands.Cog):
     def __init__(self , bot):
@@ -168,13 +170,31 @@ class Shoegaze(commands.Cog):
             await ctx.send("Invalid color input")
 
     @commands.command(aliases= ['scov'])
-    async def shoegazeconvolution(self,ctx,color):
-        attachment_url = ctx.message.attachments[0].url
-        output = await self.getShoegazedImage(attachment_url , color)
-        imag = np.asarray(Image.open(output).resize((512,512),Image.BICUBIC))
-        conv_img = await instance_convolve(imag,gaussian_kernel(5,5,1))
+    async def shoegazeconvolution(self,ctx,member:discord.Member):
+        filname = str(round(time.time()))
+        await ctx.message.add_reaction('🖌')
+        try:
+            attachment_url = ctx.message.attachments[0].url
+            await ctx.message.add_reaction('⏬')
+            await better_send(ctx, "Processing will take few seconds..")
+        except:
+            try:
+                hgp = member
+                await ctx.message.add_reaction('🎭')
+                if(ctx.message.author == hgp or hgp == None):
+                    attachment_url = ctx.message.author.avatar_url
+                else:
+                    attachment_url = hgp.avatar_url
+                await better_send(ctx, "Getting User's avatar")
+            except:
+                await better_send(ctx, "I think something went wrong!")
+                return None
+        output = downloadFileFromUrl(attachment_url,filname) + '.png'
+        luminosity = process_image_to_numpy_array(output)
+        conv_img = await instance_convolve(luminosity,EDGE_DETECT_KERNEL) # <---- maybe try adding a argument which can switch between kernel?
         Image.fromarray(conv_img).save("res.jpg")
         await ctx.send(file = open("res.jpg",'rb') , embed = output[1])
+        os.remove(filname + '.png')
 
     @shoegazeimagedistort.error
     async def errorsgid(self  , ctx , err):
