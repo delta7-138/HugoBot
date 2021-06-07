@@ -19,6 +19,45 @@ class Lastfm(commands.Cog):
         self.bot = bot 
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
 
+    async def getArtistInfo(self , artist):
+        MAX_VAL = 5900000
+    
+        
+        queryString = urllib.parse.urlencode({'artist' : artist})
+        print(queryString)
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + queryString+  '&api_key=' + LAST_FM_TOKEN + '&format=json')
+        content = res.json()
+        if("error" in content):
+            return None
+        else:
+            listeners = float(content["artist"]["stats"]["listeners"])
+            bio = content["artist"]["bio"]["summary"]
+            bio = bio.rpartition('<a href')[0]
+            tagList = content["artist"]["tags"]["tag"]
+            similarList = content["artist"]["similar"]["artist"]
+            
+            #for tag description
+            tagdescr = ""
+            for i in tagList:
+                tagdescr = tagdescr + "[{}]({}) \n".format(i["name"] , i["url"])
+            tagdescr.strip()
+
+            #for similar artist description
+            similardescr = ""
+            for i in similarList:
+                similardescr = similardescr + "[{}]({}) \n".format(i["name"] , i["url"])
+            similardescr.strip()
+
+
+            embed = discord.Embed(title = "Artist info for {}".format(artist) , url = content["artist"]["url"], color = 0xff0000)
+            embed.add_field(name = "Description" , value = bio if bio!="" else "-" , inline = False)
+            embed.add_field(name = "Tags" , value = tagdescr if tagdescr!="" else "-", inline = False)
+            embed.add_field(name = "Similar Artists" , value = similardescr if similardescr!="" else "-" , inline = False)
+            based_meter = 100 - ((listeners/float(MAX_VAL)) * 100)
+            embed.add_field(name = "Based Meter" , value = "**Artist is {:.2f} percent based**".format(based_meter) , inline = False)
+            embed.set_footer(text = "info provided through Last Fm api")
+            return embed
+    
     async def getTopArtists(self , discordUser , messageSender):
         tmpdata = self.firebaseObj.get('/lastfm' , None)
         data = dict()
@@ -557,6 +596,44 @@ class Lastfm(commands.Cog):
         
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Invalid arguments" , mention_author = True)
+
+    @commands.command(aliases = ['fma' , 'fmainfo'])
+    async def fmartistinfo(self , ctx , *args):
+        if(args==()):
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
+                    
+            member = ctx.message.author
+            userid = str(member.id)
+            if(userid not in data):
+                await ctx.send("No last fm account set")
+                return ;
+            else:
+                fmuname = data[userid]
+                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                content = json.loads(res.text)
+                track = content["recenttracks"]["track"][0]
+                trackartist = track["artist"]["#text"]
+                artist = trackartist
+                output = await self.getArtistInfo(artist)
+                if(output==None):
+                    await ctx.send("Invalid artist")
+                else:
+                    await ctx.send(embed = output)
+        else:
+            artist = args
+            artistname = ""
+            for i in artist:
+                artistname = artistname + " " + i
+
+            output = await self.getArtistInfo(artistname.strip())
+            if(output==None):
+                await ctx.send("Invalid artist")
+            else:
+                await ctx.send(embed = output)
 
 def setup(bot):
     bot.add_cog(Lastfm(bot))
