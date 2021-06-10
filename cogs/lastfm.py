@@ -193,8 +193,8 @@ class Lastfm(commands.Cog):
         res = await self.getCurrentTrack(member , ctx.message.author)
         if(res!=None):
             embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
-            embed.add_field(name = "Track Name" , value = res['trackname']  , inline = False)
-            embed.add_field(name = "Artist Name" , value = res['trackartist'] , inline = False)
+            embed.add_field(name = "Track Name" , value = res['trackname'] if(res["trackname"]!=None) else "-" , inline = False)
+            embed.add_field(name = "Artist Name" , value = res['trackartist'] if(res["trackartist"]!=None)else "-" , inline = False)
             embed.add_field(name = "Album Name", value = res['trackalbum'] if(res['trackalbum']!=None) else "-" , inline = False)
             embed.set_image(url = res['trackimg'] if res["trackimg"]!=None else "https://www.brandwatch.com/wp-content/themes/brandwatch/src/core/endpoints/resize.php?image=uploads/brandwatch/troll.jpg&width=469")
             await ctx.send(embed = embed)
