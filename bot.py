@@ -18,7 +18,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-TOKEN = os.environ['DISCORD_TOKEN']
+TOKEN = os.getenv('DISCORD_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 

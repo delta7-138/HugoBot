@@ -7,7 +7,7 @@ import time
 import random
 from discord.ext import commands
 
-API_TOKEN = os.environ['API_TOKEN']        
+API_TOKEN = os.getenv('API_TOKEN')   
 
 class Mars(commands.Cog):
     def __init__(self , bot):
