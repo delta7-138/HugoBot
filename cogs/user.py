@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from lastfm import *
+from .image import ImageClass
 
 class User(commands.Cog):
     def __init__(self , client):
@@ -22,10 +22,15 @@ class User(commands.Cog):
         
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Wrong argument" , mention_author = True)
-        
-    @commands.command(aliases = ['merge' , 'm' , 'avm'])
-    async def avatarmerge(self , ctx , member:discord.Member):
 
+    @commands.command(aliases = ['m' , 'avm' , 'mergeav'])
+    async def avatarmerge(self , ctx , member:discord.Member):
+        newobj = ImageClass()
+        await newobj.mergeImages(ctx.message.author.avatar_url , member.avatar_url)
+        fil = discord.File('out.png')
+        embed = discord.Embed(title = "Merged Avatars")
+        embed.set_image(url = 'attachment://out.png')
+        await ctx.reply(embed = embed , file = fil , mention_author = True)
 
 def setup(bot):
     bot.add_cog(User(bot))

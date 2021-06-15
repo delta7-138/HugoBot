@@ -7,9 +7,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np 
 import cv2 as cv
-import ImageClass
 from firebase import firebase
 from discord.ext import commands
+from .image import ImageClass
 import lyricsgenius as lg
 from io import BytesIO
 from pygicord import Paginator
@@ -24,6 +24,7 @@ class Lastfm(commands.Cog):
         self.bot = bot 
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
         self.genius = lg.Genius(GENIUS_TOKEN)
+ 
 
     async def getArtistInfo(self , artist):
         MAX_VAL = 5900000
@@ -658,7 +659,8 @@ class Lastfm(commands.Cog):
         if(output["trackimg"]==""):
             await ctx.reply('No cover url on last fm :pensive:' , mention_author = True)
         else:
-            await self.mergeImages(member.avatar_url , output["trackimg"])
+            newobj = ImageClass()
+            await newobj.mergeImages(member.avatar_url , output["trackimg"])
             fil = discord.File('out.png')
             embed = discord.Embed(title = "Merged pictures")
             embed.set_image(url = "attachment://out.png")
