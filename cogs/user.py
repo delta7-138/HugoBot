@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from lastfm import *
 
 class User(commands.Cog):
     def __init__(self , client):
@@ -21,6 +22,10 @@ class User(commands.Cog):
         
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Wrong argument" , mention_author = True)
+        
+    @commands.command(aliases = ['merge' , 'm' , 'avm'])
+    async def avatarmerge(self , ctx , member:discord.Member):
+
 
 def setup(bot):
     bot.add_cog(User(bot))
