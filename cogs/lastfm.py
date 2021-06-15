@@ -9,6 +9,7 @@ import numpy as np
 import cv2 as cv
 from firebase import firebase
 from discord.ext import commands
+from .image import ImageClass
 import lyricsgenius as lg
 from io import BytesIO
 from pygicord import Paginator
@@ -24,17 +25,6 @@ class Lastfm(commands.Cog):
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
         self.genius = lg.Genius(GENIUS_TOKEN)
  
-    async def mergeImages(self , url1 , url2):
-        im1 = Image.open(requests.get(url1 , stream = True).raw)
-        im2 = Image.open(requests.get(url2 , stream = True).raw)
-        im1 = im1.resize((220 , 220))
-        im2 = im2.resize((220 , 220))
-        im1.save('1.png')
-        im2.save('2.png')
-        im1arr = cv.imread('1.png')
-        im2arr = cv.imread('2.png')
-        res = cv.addWeighted(im2arr , 1 , im1arr , 0.6 , 0)
-        cv.imwrite('out.png' , res)
 
     async def getArtistInfo(self , artist):
         MAX_VAL = 5900000
@@ -669,7 +659,8 @@ class Lastfm(commands.Cog):
         if(output["trackimg"]==""):
             await ctx.reply('No cover url on last fm :pensive:' , mention_author = True)
         else:
-            await self.mergeImages(member.avatar_url , output["trackimg"])
+            newobj = ImageClass()
+            await newobj.mergeImages(member.avatar_url , output["trackimg"])
             fil = discord.File('out.png')
             embed = discord.Embed(title = "Merged pictures")
             embed.set_image(url = "attachment://out.png")
