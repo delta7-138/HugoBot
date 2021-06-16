@@ -8,6 +8,8 @@ class User(commands.Cog):
 
     @commands.command(aliases = ['av' , 'avtr'])
     async def avatar(self , ctx , member : discord.Member):
+        obj = ImageClass()
+        domHex = await obj.getDomninantColor(member.avatar_url)
         embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
         embed.set_image(url = member.avatar_url)
         await ctx.reply(embed = embed , mention_author = True)
@@ -16,6 +18,8 @@ class User(commands.Cog):
     async def avatar_err(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
+            obj = ImageClass()
+            domHex = await obj.getDomninantColor(member.avatar_url)
             embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
             embed.set_image(url = member.avatar_url)
             await ctx.reply(embed = embed ,mention_author = True)

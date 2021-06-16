@@ -17,4 +17,14 @@ class ImageClass():
         res = cv.addWeighted(im2arr , 1 , im1arr , 0.6 , 0)
         cv.imwrite('out.png' , res)
     
+    async def getDomninantColor(self , url):
+        apiurl = 'http://api.itspacchu.tk/dominant-colour'
+        im = Image.open(requests.get(url,  stream = True).raw)
+        im.resize((50 , 50))
+        im.save('tmpim.png')
+        files = {'image' : open('tmpim.png' , 'rb')}
+        r = requests.post(apiurl , files = files)
+        print(r.text)
+        
+
 
