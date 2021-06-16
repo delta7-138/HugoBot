@@ -106,49 +106,54 @@ class Shoegaze(commands.Cog):
 
     @commands.command(aliases =['sga'])
     async def shoegazeavatar(self , ctx , member:discord.Member , color):
-        output = await self.getShoegazedImage(member.avatar_url , color) 
-        if(output!=None):
-            await ctx.send(file = output[0] , embed = output[1])
-        else:
-            await ctx.send("invalid color input") 
-
-    @commands.command(aliases = ['sg' , 'sgc'])
-    async def shoegazecolor(self , ctx , color):
-        output = await self.getShoegazedImage(ctx.message.author.avatar_url , color)
-        if(output!=None):
-            await ctx.send(file = output[0] , embed = output[1])
-        else:
-            await ctx.send("invalid color input")
-    
-    @shoegazecolor.error
-    async def shoegazecolorerr(self , ctx , err):
-        if isinstance(err , commands.MissingRequiredArgument):
-            output = await self.getShoegazedImage(ctx.message.author.avatar_url , "p")
+        async with ctx.typing():
+            output = await self.getShoegazedImage(member.avatar_url , color) 
             if(output!=None):
                 await ctx.send(file = output[0] , embed = output[1])
             else:
-                await ctx.send("Invalid color input")
+                await ctx.send("invalid color input") 
+
+    @commands.command(aliases = ['sg' , 'sgc'])
+    async def shoegazecolor(self , ctx , color):
+        async with ctx.typing():
+            output = await self.getShoegazedImage(ctx.message.author.avatar_url , color)
+            if(output!=None):
+                await ctx.send(file = output[0] , embed = output[1])
+            else:
+                await ctx.send("invalid color input")
+    
+    @shoegazecolor.error
+    async def shoegazecolorerr(self , ctx , err):
+        async with ctx.typing():
+            if isinstance(err , commands.MissingRequiredArgument):
+                output = await self.getShoegazedImage(ctx.message.author.avatar_url , "p")
+                if(output!=None):
+                    await ctx.send(file = output[0] , embed = output[1])
+                else:
+                    await ctx.send("Invalid color input")
 
     @commands.command(aliases = ['sgd'])
     async def shoegazecolordistort(self , ctx , color):
-        output = await self.getShoegazedImage(ctx.message.author.avatar_url , color)
-        if(output!=None):
-            im = Image.open("res.jpg")
-            res = await self.distortImage(im)
-            res.save('res.jpg')
-            fil = discord.File('res.jpg')
-            await ctx.send(embed = output[1] , file = fil)
-        else:
-            await ctx.send("Invalid color input")
+        async with ctx.typing():
+            output = await self.getShoegazedImage(ctx.message.author.avatar_url , color)
+            if(output!=None):
+                im = Image.open("res.jpg")
+                res = await self.distortImage(im)
+                res.save('res.jpg')
+                fil = discord.File('res.jpg')
+                await ctx.send(embed = output[1] , file = fil)
+            else:
+                await ctx.send("Invalid color input")
     
     @commands.cooldown(1, 30, commands.BucketType.user)
     @commands.command(aliases = ['sgi'])
     async def shoegazeimage(self , ctx , url , color):
-        output = await self.getShoegazedImage(url , color)
-        if(output!=None):
-            await ctx.send(file = output[0] , embed = output[1])
-        else:
-            await ctx.send("Invalid color input")
+        async with ctx.typing():
+            output = await self.getShoegazedImage(url , color)
+            if(output!=None):
+                await ctx.send(file = output[0] , embed = output[1])
+            else:
+                await ctx.send("Invalid color input")
 
     @shoegazeimage.error
     async def errorsgi(self  , ctx , err):
@@ -159,15 +164,16 @@ class Shoegaze(commands.Cog):
     @commands.command(aliases = ['sgid'])
     @commands.cooldown(1, 30, commands.BucketType.user)
     async def shoegazeimagedistort(self , ctx , url , color):
-        output = await self.getShoegazedImage(url , color)
-        if(output!=None):
-            im = Image.open("res.jpg")
-            res = await self.distortImage(im)
-            res.save('res.jpg')
-            fil = discord.File('res.jpg')
-            await ctx.send(embed = output[1] , file = fil)
-        else:
-            await ctx.send("Invalid color input")
+        async with ctx.typing():
+            output = await self.getShoegazedImage(url , color)
+            if(output!=None):
+                im = Image.open("res.jpg")
+                res = await self.distortImage(im)
+                res.save('res.jpg')
+                fil = discord.File('res.jpg')
+                await ctx.send(embed = output[1] , file = fil)
+            else:
+                await ctx.send("Invalid color input")
 
     @commands.command(aliases= ['scov'])
     async def shoegazeconvolution(self,ctx,member:discord.Member):
