@@ -8,7 +8,9 @@ class User(commands.Cog):
 
     @commands.command(aliases = ['av' , 'avtr'])
     async def avatar(self , ctx , member : discord.Member):
-        embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
+        newobj = ImageClass()
+        domHex = await newobj.getDomninantColor(member.avatar_url)
+        embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
         embed.set_image(url = member.avatar_url)
         await ctx.reply(embed = embed , mention_author = True)
 
@@ -16,7 +18,9 @@ class User(commands.Cog):
     async def avatar_err(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
-            embed = discord.Embed(title = "Member avatar" , color = 0xff00ff)
+            newobj = ImageClass()
+            domHex = await newobj.getDomninantColor(member.avatar_url)
+            embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
             embed.set_image(url = member.avatar_url)
             await ctx.reply(embed = embed ,mention_author = True)
         
