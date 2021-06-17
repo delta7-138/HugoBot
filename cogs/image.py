@@ -1,6 +1,7 @@
 import requests
 import numpy as np 
 import cv2 as cv
+import json 
 from PIL import Image
 
 class ImageClass():
@@ -18,13 +19,14 @@ class ImageClass():
         cv.imwrite('out.png' , res)
     
     async def getDomninantColor(self , url):
-        apiurl = 'http://api.itspacchu.tk/dominant-colour'
-        im = Image.open(requests.get(url,  stream = True).raw)
-        im.resize((50 , 50))
+        apiurl = 'http://api.itspacchu.tk/dominant_color'
+        im = Image.open(requests.get(url,  stream = True).raw) 
+        im = im.resize((45 , 45))
         im.save('tmpim.png')
         files = {'image' : open('tmpim.png' , 'rb')}
         r = requests.post(apiurl , files = files)
-        print(r.text)
+        content = json.loads(r.text)
+        return content["hexval"]
         
 
 

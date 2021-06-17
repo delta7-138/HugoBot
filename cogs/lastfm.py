@@ -667,6 +667,27 @@ class Lastfm(commands.Cog):
             embed = discord.Embed(title = "Merged pictures")
             embed.set_image(url = "attachment://out.png")
             await ctx.send(embed = embed , file = fil)
+
+    @commands.command(aliases = ['setc' , 'embedc'])
+    async def setembedcolor(self , ctx , hex):
+        if(hex.startswith('0x')!=True or len(hex)!=8):
+            await ctx.send('Send correct format starting with `0x`')
+        else:
+            try:
+                integerVal = int(hex , 16)
+                tmpdata = self.firebaseObj.get('/color' , None)
+                data = dict()
+                for key,value in tmpdata.items(): 
+                    for subKey, subVal in value.items():
+                        data[subKey] = subVal
+
+                userid = str(ctx.message.author.id)
+                tmp = {userid : hex}
+                self.firebaseObj.post('/color' , tmp)
+                await ctx.send('Embed color updated successfully')
+            except:
+                await ctx.send('Send valid hex code')
+                
         
 def setup(bot):
     bot.add_cog(Lastfm(bot))
