@@ -12,6 +12,7 @@ class User(commands.Cog):
         domHex = await newobj.getDomninantColor(member.avatar_url)
         embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
         embed.set_image(url = member.avatar_url)
+        embed.set_footer(text = "with the help of [Pacchu's Apis](http://api.itspacchu.tk/)")
         await ctx.reply(embed = embed , mention_author = True)
 
     @avatar.error
