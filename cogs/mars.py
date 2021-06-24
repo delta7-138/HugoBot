@@ -6,7 +6,8 @@ import os
 import time
 import random
 from discord.ext import commands
-        
+
+API_TOKEN = os.getenv('API_TOKEN')   
 
 class Mars(commands.Cog):
     def __init__(self , bot):
@@ -70,7 +71,15 @@ class Mars(commands.Cog):
         except: 
             await ctx.reply("No image available :pensive:" , mention_author = True)
 
-    
+    @commands.command(aliases = ['e' , 'eimg'])
+    async def earth(self , ctx , latitude, longitude): 
+        today = datetime.datetime.today().strftime('2021-01-01')
+        print(API_TOKEN)
+        base_url = 'https://api.nasa.gov/planetary/earth/imagery?lon=' + longitude + '&lat='  + latitude + '&date=' + today + '&api_key=' + API_TOKEN
+        response = requests.get(base_url)
+        if response.status_code == 200:
+            with open("sample.jpg", 'wb') as f:
+                f.write(response.content)
 
 def setup(bot):
     bot.add_cog(Mars(bot))
