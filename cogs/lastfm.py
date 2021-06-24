@@ -93,7 +93,11 @@ class Lastfm(commands.Cog):
             dicttrack = {'trackname' : trackname , 'trackartist' : trackartist , 'trackalbum' : trackalbum , 'trackimg' : trackimg }
             return dicttrack
 
-    async def getTopArtists(self , discordUser , messageSender):
+    async def getTopArtists(self , discordUser , messageSender , query):
+        period = 'overall'
+        reference_args = {'w': '7day' , 'm' : '1month' , 'y' : '12month'}
+        if(query in reference_args):
+            period = reference_args[query]
         tmpdata = self.firebaseObj.get('/lastfm' , None)
         data = dict()
         for key,value in tmpdata.items(): 
@@ -105,9 +109,9 @@ class Lastfm(commands.Cog):
             return None
         
         lastfmuname = data[userid]
-        queryUname = urllib.parse.urlencode({'user' : lastfmuname})
+        queryUname = urllib.parse.urlencode({'user' : lastfmuname , 'period' : period})
         print(queryUname)
-        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettopartists&' + queryUname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
         content = res.json()
         
         description = ""
@@ -121,7 +125,11 @@ class Lastfm(commands.Cog):
         embed.set_footer(text = "requested by {}, info provided by Last Fm api".format(messageSender.name))
         return embed
 
-    async def getTopAlbumsTracks(self , discordUser , messageSender , flag):
+    async def getTopAlbumsTracks(self , discordUser , messageSender , flag , query):
+        period = 'overall'
+        reference_args = {'w': '7day' , 'm' : '1month' , 'y' : '12month'}
+        if(query in reference_args):
+            period = reference_args[query]
         tag = "track"
         if(flag==1):
             tag = "album"
@@ -136,9 +144,9 @@ class Lastfm(commands.Cog):
             return None
         
         lastfmuname = data[userid]
-        queryUname = urllib.parse.urlencode({'user' : lastfmuname})
+        queryUname = urllib.parse.urlencode({'user' : lastfmuname , 'period' : period})
         print(queryUname)
-        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettop' + tag + 's&' + queryUname + '&period=7day&api_key=' + LAST_FM_TOKEN + '&format=json')
+        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.gettop' + tag + 's&' + queryUname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
         content = res.json()
         
         description = ""
@@ -527,10 +535,10 @@ class Lastfm(commands.Cog):
                 await ctx.send(embed = embed)    
     
     @commands.command(aliases = ['fmta' , 'fmtopa' , 'fmtoparts'])
-    async def fmtopartists(self , ctx , member:discord.Member):
-        discordUser = member
+    async def fmtopartists(self , ctx , query):
         sender = ctx.message.author
-        embed = await self.getTopArtists(discordUser , sender)
+        discordUser = sender
+        embed = await self.getTopArtists(discordUser , sender, query)
         if(embed != None):
             await ctx.send(embed = embed)
         else:
@@ -539,8 +547,9 @@ class Lastfm(commands.Cog):
     @fmtopartists.error
     async def fmtaerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
+            query = '0'
             member = ctx.message.author
-            embed = await self.getTopArtists(member , member)
+            embed = await self.getTopArtists(member , member , query)
             if(embed !=None):
                 await ctx.send(embed = embed)
             else:
@@ -550,10 +559,10 @@ class Lastfm(commands.Cog):
             await ctx.reply("Invalid arguments" , mention_author = True)
 
     @commands.command(aliases = ['fmtt' , 'fmtoptr' , 'fmttracks'])
-    async def fmtoptracks(self , ctx , member:discord.Member):
-        discordUser = member
+    async def fmtoptracks(self , ctx , query):
         sender = ctx.message.author
-        embed = await self.getTopAlbumsTracks(discordUser , sender , 0)
+        discordUser = sender
+        embed = await self.getTopAlbumsTracks(discordUser , sender , 0 , query)
         if(embed != None):
             await ctx.send(embed = embed)
         else:
@@ -563,7 +572,8 @@ class Lastfm(commands.Cog):
     async def fmtterr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
-            embed = await self.getTopAlbumsTracks(member , member , 0)
+            query = 'o'
+            embed = await self.getTopAlbumsTracks(member , member , 0 , query)
             if(embed !=None):
                 await ctx.send(embed = embed)
             else:
@@ -573,20 +583,21 @@ class Lastfm(commands.Cog):
             await ctx.reply("Invalid arguments" , mention_author = True)
     
     @commands.command(aliases = ['fmtal' , 'fmtopal' , 'fmtalbums'])
-    async def fmtopalbums(self , ctx , member:discord.Member):
-        discordUser = member
+    async def fmtopalbums(self , ctx , query):
         sender = ctx.message.author
-        embed = await self.getTopAlbumsTracks(discordUser , sender , 1)
+        discordUser = sender
+        embed = await self.getTopAlbumsTracks(discordUser , sender , 1 , query)
         if(embed != None):
             await ctx.send(embed = embed)
         else:
             await ctx.reply("Invalid user" , mention_author = True)
 
     @fmtopalbums.error
-    async def fmtterr(self , ctx , err):
+    async def fmtopalerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
-            embed = await self.getTopAlbumsTracks(member , member , 1)
+            query = 'o'
+            embed = await self.getTopAlbumsTracks(member , member , 1 , query)
             if(embed !=None):
                 await ctx.send(embed = embed)
             else:
@@ -668,25 +679,25 @@ class Lastfm(commands.Cog):
             embed.set_image(url = "attachment://out.png")
             await ctx.send(embed = embed , file = fil)
 
-    @commands.command(aliases = ['setc' , 'embedc'])
-    async def setembedcolor(self , ctx , hex):
-        if(hex.startswith('0x')!=True or len(hex)!=8):
-            await ctx.send('Send correct format starting with `0x`')
-        else:
-            try:
-                integerVal = int(hex , 16)
-                tmpdata = self.firebaseObj.get('/color' , None)
-                data = dict()
-                for key,value in tmpdata.items(): 
-                    for subKey, subVal in value.items():
-                        data[subKey] = subVal
+    # @commands.command(aliases = ['setc' , 'embedc'])
+    # async def setembedcolor(self , ctx , hex):
+    #     if(hex.startswith('0x')!=True or len(hex)!=8):
+    #         await ctx.send('Send correct format starting with `0x`')
+    #     else:
+    #         try:
+    #             integerVal = int(hex , 16)
+    #             tmpdata = self.firebaseObj.get('/color' , None)
+    #             data = dict()
+    #             for key,value in tmpdata.items(): 
+    #                 for subKey, subVal in value.items():
+    #                     data[subKey] = subVal
 
-                userid = str(ctx.message.author.id)
-                tmp = {userid : hex}
-                self.firebaseObj.post('/color' , tmp)
-                await ctx.send('Embed color updated successfully')
-            except:
-                await ctx.send('Send valid hex code')
+    #             userid = str(ctx.message.author.id)
+    #             tmp = {userid : hex}
+    #             self.firebaseObj.post('/color' , tmp)
+    #             await ctx.send('Embed color updated successfully')
+    #         except:
+    #             await ctx.send('Send valid hex code')
                 
         
 def setup(bot):
