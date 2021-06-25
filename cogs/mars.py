@@ -102,7 +102,7 @@ class Mars(commands.Cog):
             urllib.request.urlretrieve(base_url, "earth.jpg")
             fil = discord.File('earth.jpg')
             embed = discord.Embed(title = 'Earth', color = 0x0000ff)
-            embed.set_image(url = 'attachment//earth.jpg')
+            embed.set_image(url = 'attachment://earth.jpg')
             embed.set_footer(text = 'provided by NASA APIs')
             await ctx.send(embed = embed , file = fil)
 
