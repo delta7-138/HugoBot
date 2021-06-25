@@ -101,7 +101,10 @@ class Mars(commands.Cog):
             base_url = 'https://api.nasa.gov/planetary/earth/imagery?lon=' + longitude + '&lat='  + latitude + '&date=' + today + '&api_key=' + API_TOKEN + '&dim=0.15'
             urllib.request.urlretrieve(base_url, "earth.jpg")
             fil = discord.File('earth.jpg')
-            await ctx.send(file = fil)
+            embed = discord.Embed(title = 'Earth', color = 0x0000ff)
+            embed.set_image(url = 'attachment//earth.jpg')
+            embed.set_footer(text = 'provided by NASA APIs')
+            await ctx.send(embed = embed , file = fil)
 
     @commands.command(aliases = ['marsh' , 'mh'])
     async def marshelp(self , ctx):
