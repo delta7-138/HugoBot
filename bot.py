@@ -25,8 +25,11 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 API_TOKEN = os.getenv('API_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
-client = commands.Bot(command_prefix = 'h.')
-cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc" , "cogs.mars" , "cogs.lastfm" , "cogs.shoegaze"]
+intents = discord.Intents.default()
+intents.members = True
+intents.voice_states = True
+client = commands.Bot(command_prefix = '^' , intents = intents)
+cogs = ["cogs.user" , "cogs.color" , "cogs.codeforces" , "cogs.randomfunc" , "cogs.mars" , "cogs.lastfm" , "cogs.shoegaze"  , "cogs.voice"]
 for cog in cogs:
     client.load_extension(cog)
 client.remove_command('help')
