@@ -5,6 +5,7 @@ import json
 import os
 import time
 import random
+import urllib.request
 from discord.ext import commands
 
 API_TOKEN = os.getenv('API_TOKEN')   
@@ -72,14 +73,14 @@ class Mars(commands.Cog):
             await ctx.reply("No image available :pensive:" , mention_author = True)
 
     @commands.command(aliases = ['e' , 'eimg'])
-    async def earth(self , ctx , latitude, longitude): 
-        today = datetime.datetime.today().strftime('2021-01-01')
-        print(API_TOKEN)
-        base_url = 'https://api.nasa.gov/planetary/earth/imagery?lon=' + longitude + '&lat='  + latitude + '&date=' + today + '&api_key=' + API_TOKEN
-        response = requests.get(base_url)
-        if response.status_code == 200:
-            with open("sample.jpg", 'wb') as f:
-                f.write(response.content)
+    async def earth(self , ctx , latitude, longitude):
+        async with ctx.typing(): 
+            today = datetime.datetime.today().strftime('2021-01-01')
+            print(API_TOKEN)
+            base_url = 'https://api.nasa.gov/planetary/earth/imagery?lon=' + longitude + '&lat='  + latitude + '&date=' + today + '&api_key=' + API_TOKEN + '&dim=0.15'
+            urllib.request.urlretrieve(base_url, "earth.jpg")
+            fil = discord.File('earth.jpg')
+            await ctx.send(file = fil)
 
 def setup(bot):
     bot.add_cog(Mars(bot))
