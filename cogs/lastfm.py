@@ -37,6 +37,14 @@ class Lastfm(commands.Cog):
         if("error" in content):
             return None
         else:
+            base_url = 'https://api.genius.com/'
+            auth = {'Authorization' : 'Bearer ' + GENIUS_TOKEN}
+            res = requests.get(base_url + 'search' , params = {'q' : artist} , headers = auth)
+            geniuscontent = res.json()
+            id = geniuscontent["response"]["hits"][0]["result"]["primary_artist"]["id"]
+            res2 = requests.get(base_url + 'artists/' + str(id) , headers = auth)
+            content2 = res2.json()
+            url = content2["response"]["artist"]["image_url"]
             listeners = float(content["artist"]["stats"]["listeners"])
             bio = content["artist"]["bio"]["summary"]
             bio = bio.rpartition('<a href')[0]
@@ -63,6 +71,7 @@ class Lastfm(commands.Cog):
             based_meter = 100 - ((listeners/float(MAX_VAL)) * 100)
             embed.add_field(name = "Based Meter" , value = "**Artist is {:.2f} percent based**".format(based_meter) , inline = False)
             embed.set_footer(text = "info provided through Last Fm api")
+            embed.set_thumbnail(url = url)
             return embed
         
     async def getLyricsObject(self , trackartist , trackname):
