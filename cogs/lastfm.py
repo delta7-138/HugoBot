@@ -13,11 +13,12 @@ from .image import ImageClass
 import lyricsgenius as lg
 from io import BytesIO
 from pygicord import Paginator
-from PIL import Image
+from PIL import Image, ImageFilter
 
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 GENIUS_TOKEN = os.getenv('GENIUS_TOKEN')
+SPOTIFY_AUTH_TOKEN = os.getenv('SPOTIFY_AUTH_TOKEN')
 
 class Lastfm(commands.Cog):
     def __init__(self , bot):
@@ -37,6 +38,14 @@ class Lastfm(commands.Cog):
         if("error" in content):
             return None
         else:
+            base_url = 'https://api.genius.com/'
+            auth = {'Authorization' : 'Bearer ' + GENIUS_TOKEN}
+            res = requests.get(base_url + 'search' , params = {'q' : artist} , headers = auth)
+            geniuscontent = res.json()
+            id = geniuscontent["response"]["hits"][0]["result"]["primary_artist"]["id"]
+            res2 = requests.get(base_url + 'artists/' + str(id) , headers = auth)
+            content2 = res2.json()
+            url = content2["response"]["artist"]["image_url"]
             listeners = float(content["artist"]["stats"]["listeners"])
             bio = content["artist"]["bio"]["summary"]
             bio = bio.rpartition('<a href')[0]
@@ -63,6 +72,7 @@ class Lastfm(commands.Cog):
             based_meter = 100 - ((listeners/float(MAX_VAL)) * 100)
             embed.add_field(name = "Based Meter" , value = "**Artist is {:.2f} percent based**".format(based_meter) , inline = False)
             embed.set_footer(text = "info provided through Last Fm api")
+            embed.set_thumbnail(url = url)
             return embed
         
     async def getLyricsObject(self , trackartist , trackname):
@@ -174,31 +184,32 @@ class Lastfm(commands.Cog):
 
     @commands.command()
     async def fmset(self , ctx , *args):
-        tmpdata = self.firebaseObj.get('/lastfm' , None)
-        data = dict()
-        for key,value in tmpdata.items(): 
-            for subKey, subVal in value.items():
-                data[subKey] = subVal
+        async with ctx.typing():
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
 
-        userid = str(ctx.message.author.id)
-        fmuname = args[0]
+            userid = str(ctx.message.author.id)
+            fmuname = args[0]
 
 
-        for key, value in data.items(): 
-            if(key==userid or value==fmuname):
-                await ctx.send("User is already there")
-                return 0
-            else:
-                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
-                content = json.loads(res.text)
-                if("message" in content and content["message"]=="User not found"):
-                    await ctx.send("User not found :(")
+            for key, value in data.items(): 
+                if(key==userid or value==fmuname):
+                    await ctx.send("User is already there")
                     return 0
+                else:
+                    res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json')
+                    content = json.loads(res.text)
+                    if("message" in content and content["message"]=="User not found"):
+                        await ctx.send("User not found :(")
+                        return 0
 
-        data[userid] = fmuname
-        tmp = {userid : fmuname}
-        self.firebaseObj.post('/lastfm' , tmp)
-        await ctx.send("User successfully added :vampire:")
+            data[userid] = fmuname
+            tmp = {userid : fmuname}
+            self.firebaseObj.post('/lastfm' , tmp)
+            await ctx.send("User successfully added :vampire:")
 
     @commands.command()
     async def fm(self , ctx , member : discord.Member):
@@ -228,91 +239,30 @@ class Lastfm(commands.Cog):
     @fm.error
     async def fmerror(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            res = await self.getCurrentTrack(ctx.message.author , ctx.message.author)
-            if(res!=None):
-                embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
-                embed.add_field(name = "Track Name" , value = res['trackname']  , inline = False)
-                embed.add_field(name = "Artist Name" , value = res['trackartist'] , inline = False)
-                embed.add_field(name = "Album Name", value = res['trackalbum'] if(res['trackalbum']!=None) else "-" , inline = False)
-                embed.set_image(url = res['trackimg'])
-                await ctx.send(embed = embed)
-            else:
-                await ctx.send("no last fm set")            
+            async with ctx.typing(): 
+                res = await self.getCurrentTrack(ctx.message.author , ctx.message.author)
+                if(res!=None):
+                    embed = discord.Embed(title = 'Now Playing/Recent Track' , color=0x00ffea)
+                    embed.add_field(name = "Track Name" , value = res['trackname']  , inline = False)
+                    embed.add_field(name = "Artist Name" , value = res['trackartist'] , inline = False)
+                    embed.add_field(name = "Album Name", value = res['trackalbum'] if(res['trackalbum']!=None) else "-" , inline = False)
+                    embed.set_image(url = res['trackimg'])
+                    await ctx.send(embed = embed)
+                else:
+                    await ctx.send("no last fm set")            
 
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Wrong argument" , mention_author = True)  
 
     @commands.command(aliases = ['fmwhoknows' , 'fmwk'])
     async def fmw(self , ctx , *, args):
-        tmpdata = self.firebaseObj.get('/lastfm' , None)
-        data = dict()
-        for key,value in tmpdata.items(): 
-            for subKey, subVal in value.items():
-                data[subKey] = subVal
-        artist = args
-        leaderBoard = dict()
-        image = ""
-        async for member in ctx.guild.fetch_members(limit = None):
-            memberID = str(member.id)
-            if(memberID in data):
-                uname = data[memberID]
-                nick = member.name
-                unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-                parsedURL = urllib.parse.urlencode(unparsedURL)
-                res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
-                content = json.loads(res2.text)
-                playCount = content['artist']['stats']['userplaycount']
-                image = content['artist']['image'][1]['#text']
-                if(playCount!='0'):
-                    leaderBoard[nick] = int(playCount)
-            
-        leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-        labels = []
-        values = []
-        for x,y in leaderBoard[:5]:
-            labels.append(x)
-            values.append(y)
-
-        x = np.arange(len(labels))
-        width = 0.35
-        fig, ax = plt.subplots()
-        rects1 = ax.bar(x - width/4, values, width, label='Men')
-        ax.set_ylabel('Play Count for ' + artist)
-        ax.set_title('Who knows ' + artist)
-        ax.set_xticks(x)
-        ax.set_xticklabels(labels)
-        ax.bar_label(rects1, padding=3)
-        fig.tight_layout()
-        buffer = BytesIO()
-        plt.savefig(buffer , format = "png")
-        buffer.seek(0)
-        plt.close()
-        fil = discord.File(filename = 'whoknows.png' , fp = buffer)
-        # embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
-        # for key,value in leaderBoard:
-        #     embed.add_field(name = key, value = value , inline = False)
-        await ctx.send(file = fil)
-
-    @fmw.error
-    async def fmwerror(self , ctx , err):
-        if isinstance(err , commands.MissingRequiredArgument):
+        async with ctx.typing():
             tmpdata = self.firebaseObj.get('/lastfm' , None)
             data = dict()
             for key,value in tmpdata.items(): 
                 for subKey, subVal in value.items():
                     data[subKey] = subVal
-            artist = ""
-            userid = str(ctx.message.author.id)
-            if(userid not in data):
-                await ctx.send("Please set your last fm account first")
-                return ;
-            else:
-                fmuname = data[userid]
-                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
-                content = json.loads(res.text)
-                track = content["recenttracks"]["track"][0]
-                artist = track["artist"]["#text"]
-
+            artist = args
             leaderBoard = dict()
             image = ""
             async for member in ctx.guild.fetch_members(limit = None):
@@ -329,7 +279,35 @@ class Lastfm(commands.Cog):
                     if(playCount!='0'):
                         leaderBoard[nick] = int(playCount)
             
+            base_url = 'https://api.genius.com/'
+            auth = {'Authorization' : 'Bearer ' + GENIUS_TOKEN}
+            res = requests.get(base_url + 'search' , params = {'q' : artist} , headers = auth)
+            geniuscontent = res.json()
+            id = geniuscontent["response"]["hits"][0]["result"]["primary_artist"]["id"]
+            res2 = requests.get(base_url + 'artists/' + str(id) , headers = auth)
+            content2 = res2.json()
+            aimgurl = content2["response"]["artist"]["image_url"]
             leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+            im = Image.open(requests.get(aimgurl , stream = True).raw)
+            im = im.filter(ImageFilter.GaussianBlur(5))
+            im.save('whoknows.png')
+            im = im.resize((48 , 48))
+            im.save('artisttmp.png')
+            apiurl = 'http://api.itspacchu.tk/dominant_color'
+            files = {'image' : open('artisttmp.png' , 'rb')}
+            r = requests.post(apiurl , files = files)
+            hexcontent = r.json()
+            pcolor = hexcontent["hexval"]
+            pcolorR = pcolor[2:4]
+            pcolorG = pcolor[4:6]
+            pcolorB = pcolor[6:8]
+            newPcolorR = hex(255 - int(pcolorR , 16))[2:]
+            newPcolorG = hex(255 - int(pcolorG , 16))[2:]
+            newPcolorB = hex(255 - int(pcolorB , 16))[2:]
+            contrastColor = "#" + newPcolorR + newPcolorG  + newPcolorB
+            
+            
+
             labels = []
             values = []
             for x,y in leaderBoard[:5]:
@@ -339,7 +317,9 @@ class Lastfm(commands.Cog):
             x = np.arange(len(labels))
             width = 0.35
             fig, ax = plt.subplots()
-            rects1 = ax.bar(x - width/4, values, width, label='Men')
+            img = plt.imread("whoknows.png")
+            ax.imshow(img)
+            rects1 = ax.bar(x - width/4, values, width, label='Men' , color = [contrastColor] * len(labels))
             ax.set_ylabel('Play Count for ' + artist)
             ax.set_title('Who knows ' + artist)
             ax.set_xticks(x)
@@ -356,328 +336,407 @@ class Lastfm(commands.Cog):
             #     embed.add_field(name = key, value = value , inline = False)
             await ctx.send(file = fil)
 
+    # @fmw.error
+    # async def fmwerror(self , ctx , err):
+    #     if isinstance(err , commands.MissingRequiredArgument):
+    #         async with ctx.typing():
+    #             tmpdata = self.firebaseObj.get('/lastfm' , None)
+    #             data = dict()
+    #             for key,value in tmpdata.items(): 
+    #                 for subKey, subVal in value.items():
+    #                     data[subKey] = subVal
+    #             artist = ""
+    #             userid = str(ctx.message.author.id)
+    #             if(userid not in data):
+    #                 await ctx.send("Please set your last fm account first")
+    #                 return ;
+    #             else:
+    #                 fmuname = data[userid]
+    #                 res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+    #                 content = json.loads(res.text)
+    #                 track = content["recenttracks"]["track"][0]
+    #                 artist = track["artist"]["#text"]
+
+    #             leaderBoard = dict()
+
+    #             image = ""
+    #             async for member in ctx.guild.fetch_members(limit = None):
+    #                 memberID = str(member.id)
+    #                 if(memberID in data):
+    #                     uname = data[memberID]
+    #                     nick = member.name
+    #                     unparsedURL = {'artist' : artist , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+    #                     parsedURL = urllib.parse.urlencode(unparsedURL)
+    #                     res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&' + parsedURL)
+    #                     content = json.loads(res2.text)
+    #                     playCount = content['artist']['stats']['userplaycount']
+    #                     image = content['artist']['image'][1]['#text']
+    #                     if(playCount!='0'):
+    #                         leaderBoard[nick] = int(playCount)
+                
+    #             leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+    #             labels = []
+    #             values = []
+    #             for x,y in leaderBoard[:5]:
+    #                 labels.append(x)
+    #                 values.append(y)
+
+    #             x = np.arange(len(labels))
+    #             width = 0.35
+    #             fig, ax = plt.subplots()
+    #             rects1 = ax.bar(x - width/4, values, width, label='Men')
+    #             ax.set_ylabel('Play Count for ' + artist)
+    #             ax.set_title('Who knows ' + artist)
+    #             ax.set_xticks(x)
+    #             ax.set_xticklabels(labels)
+    #             ax.bar_label(rects1, padding=3)
+    #             fig.tight_layout()
+    #             buffer = BytesIO()
+    #             plt.savefig(buffer , format = "png")
+    #             buffer.seek(0)
+    #             plt.close()
+    #             fil = discord.File(filename = 'whoknows.png' , fp = buffer)
+    #             # embed = discord.Embed(title = 'WHO KNOWS **' + artist + '**' , color=0x00ffea)
+    #             # for key,value in leaderBoard:
+    #             #     embed.add_field(name = key, value = value , inline = False)
+    #             await ctx.send(file = fil)
+
     @commands.command(aliases = ['fmwka' , 'fmwa'])
     async def fmwhoknowsalbum(self , ctx , * , args):
-        tmpdata = self.firebaseObj.get('/lastfm' , None)
-        data = dict()
-        for key,value in tmpdata.items(): 
-            for subKey, subVal in value.items():
-                data[subKey] = subVal
-        artistAlbum = args.split("-")
-        artistAlbum = [i.strip() for i in artistAlbum]
-        album = artistAlbum[1]
-        artist = artistAlbum[0]
-        leaderBoard = dict()
-        image = ""
-        async for member in ctx.guild.fetch_members(limit = None):
-            memberID = str(member.id)
-            if(memberID in data):
-                uname = data[memberID]
-                nick = member.name
-                unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-                parsedURL = urllib.parse.urlencode(unparsedURL)
-                res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
-                content = json.loads(res2.text)
-                playCount = content['album']['userplaycount']
-                image = content['album']['image'][2]['#text']
-                if(playCount!='0'):
-                    leaderBoard[nick] = int(playCount)
-        
-        leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-        description = ""
-        ctr = 0
-        for key,value in leaderBoard:
-            ctr+=1
-            description = description + str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
+        async with ctx.typing(): 
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
+            artistAlbum = args.split("-")
+            artistAlbum = [i.strip() for i in artistAlbum]
+            album = artistAlbum[1]
+            artist = artistAlbum[0]
+            leaderBoard = dict()
+            image = ""
+            async for member in ctx.guild.fetch_members(limit = None):
+                memberID = str(member.id)
+                if(memberID in data):
+                    uname = data[memberID]
+                    nick = member.name
+                    unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+                    parsedURL = urllib.parse.urlencode(unparsedURL)
+                    res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
+                    content = json.loads(res2.text)
+                    playCount = content['album']['userplaycount']
+                    image = content['album']['image'][2]['#text']
+                    if(playCount!='0'):
+                        leaderBoard[nick] = int(playCount)
+            
+            leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+            description = ""
+            ctr = 0
+            for key,value in leaderBoard:
+                ctr+=1
+                description = description + str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
-        embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
-        embed.set_thumbnail(url = image)
-        embed.set_footer(text = "requested by " + ctx.message.author.name)
-        await ctx.send(embed = embed) 
+            embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
+            embed.set_thumbnail(url = image)
+            embed.set_footer(text = "requested by " + ctx.message.author.name)
+            await ctx.send(embed = embed) 
 
     @fmwhoknowsalbum.error
     async def fmwhoknowsalbumerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
+            async with ctx.typing():
+                tmpdata = self.firebaseObj.get('/lastfm' , None)
+                data = dict()
+                for key,value in tmpdata.items(): 
+                    for subKey, subVal in value.items():
+                        data[subKey] = subVal
+                artist = ""
+                album = ""
+                userid = str(ctx.message.author.id)
+                if(userid not in data):
+                    await ctx.send("Please set your last fm account first")
+                    return ;
+                else:
+                    fmuname = data[userid]
+                    res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                    content = json.loads(res.text)
+                    track = content["recenttracks"]["track"][0]
+                    artist = track["artist"]["#text"]
+                    album = track["album"]["#text"]
+            
+                    leaderBoard = dict()
+                    image = ""
+                    async for member in ctx.guild.fetch_members(limit = None):
+                        memberID = str(member.id)
+                        if(memberID in data):
+                            uname = data[memberID]
+                            nick = member.name
+                            unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+                            parsedURL = urllib.parse.urlencode(unparsedURL)
+                            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
+                            content = json.loads(res2.text)
+                            playCount = content['album']['userplaycount']
+                            image = content['album']['image'][2]['#text']
+                            if(playCount!='0'):
+                                leaderBoard[nick] = int(playCount)
+
+                    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+                    description = ""
+                    ctr = 0
+                    for key,value in leaderBoard:
+                        ctr+=1
+                        description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
+
+                    embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
+                    embed.set_thumbnail(url = image)
+                    embed.set_footer(text = "requested by " + ctx.message.author.name)
+                    await ctx.send(embed = embed) 
+
+    @commands.command(aliases = ['fmwt' , 'fmwkt'])
+    async def fmwhoknowstrack(self , ctx , * , args):
+        async with ctx.typing():
             tmpdata = self.firebaseObj.get('/lastfm' , None)
             data = dict()
             for key,value in tmpdata.items(): 
                 for subKey, subVal in value.items():
                     data[subKey] = subVal
-            artist = ""
-            album = ""
-            userid = str(ctx.message.author.id)
-            if(userid not in data):
-                await ctx.send("Please set your last fm account first")
-                return ;
-            else:
-                fmuname = data[userid]
-                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
-                content = json.loads(res.text)
-                track = content["recenttracks"]["track"][0]
-                artist = track["artist"]["#text"]
-                album = track["album"]["#text"]
-        
-                leaderBoard = dict()
-                image = ""
-                async for member in ctx.guild.fetch_members(limit = None):
-                    memberID = str(member.id)
-                    if(memberID in data):
-                        uname = data[memberID]
-                        nick = member.name
-                        unparsedURL = {'artist' : artist , 'album' : album , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-                        parsedURL = urllib.parse.urlencode(unparsedURL)
-                        res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&' + parsedURL)
-                        content = json.loads(res2.text)
-                        playCount = content['album']['userplaycount']
-                        image = content['album']['image'][2]['#text']
-                        if(playCount!='0'):
-                            leaderBoard[nick] = int(playCount)
+            artistTrack = args.split("-")
+            artistTrack = [i.strip() for i in artistTrack]
+            track = artistTrack[1]
+            artist = artistTrack[0]
+            leaderBoard = dict()
+            image = ""
+            async for member in ctx.guild.fetch_members(limit = None):
+                memberID = str(member.id)
+                if(memberID in data):
+                    uname = data[memberID]
+                    nick = member.name
+                    unparsedURL = {'artist' : artist , 'track' : track, 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+                    parsedURL = urllib.parse.urlencode(unparsedURL)
+                    res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
+                    content = json.loads(res2.text)
+                    playCount = content['track']['userplaycount']
+                    image = content['track']["album"]['image'][2]['#text']
+                    if(playCount!='0'):
+                        leaderBoard[nick] = int(playCount)
 
-                leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-                description = ""
-                ctr = 0
-                for key,value in leaderBoard:
-                    ctr+=1
-                    description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
+            leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+            description = ""
+            ctr = 0
+            for key,value in leaderBoard:
+                ctr+=1
+                description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
-                embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + album + '**' , description = description , color=0x00ffea)
-                embed.set_thumbnail(url = image)
-                embed.set_footer(text = "requested by " + ctx.message.author.name)
-                await ctx.send(embed = embed) 
-
-    @commands.command(aliases = ['fmwt' , 'fmwkt'])
-    async def fmwhoknowstrack(self , ctx , * , args):
-        tmpdata = self.firebaseObj.get('/lastfm' , None)
-        data = dict()
-        for key,value in tmpdata.items(): 
-            for subKey, subVal in value.items():
-                data[subKey] = subVal
-        artistTrack = args.split("-")
-        artistTrack = [i.strip() for i in artistTrack]
-        track = artistTrack[1]
-        artist = artistTrack[0]
-        leaderBoard = dict()
-        image = ""
-        async for member in ctx.guild.fetch_members(limit = None):
-            memberID = str(member.id)
-            if(memberID in data):
-                uname = data[memberID]
-                nick = member.name
-                unparsedURL = {'artist' : artist , 'track' : track, 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-                parsedURL = urllib.parse.urlencode(unparsedURL)
-                res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
-                content = json.loads(res2.text)
-                playCount = content['track']['userplaycount']
-                image = content['track']["album"]['image'][2]['#text']
-                if(playCount!='0'):
-                    leaderBoard[nick] = int(playCount)
-
-        leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-        description = ""
-        ctr = 0
-        for key,value in leaderBoard:
-            ctr+=1
-            description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
-
-        embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
-        embed.set_thumbnail(url = image)
-        embed.set_footer(text = "requested by " + ctx.message.author.name)
-        await ctx.send(embed = embed) 
+            embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
+            embed.set_thumbnail(url = image)
+            embed.set_footer(text = "requested by " + ctx.message.author.name)
+            await ctx.send(embed = embed) 
 
     @fmwhoknowstrack.error
     async def fmwhoknowstrackerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            tmpdata = self.firebaseObj.get('/lastfm' , None)
-            data = dict()
-            for key,value in tmpdata.items(): 
-                for subKey, subVal in value.items():
-                    data[subKey] = subVal
-            artist = ""
-            track= ""
-            userid = str(ctx.message.author.id)
-            if(userid not in data):
-                await ctx.send("Please set your last fm account first")
-                return ;
-            else:
-                fmuname = data[userid]
-                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
-                content = json.loads(res.text)
-                trackitem = content["recenttracks"]["track"][0]
-                artist = trackitem["artist"]["#text"]
-                track = trackitem["name"]
-        
-                leaderBoard = dict()
-                image = ""
-                async for member in ctx.guild.fetch_members(limit = None):
-                    memberID = str(member.id)
-                    if(memberID in data):
-                        uname = data[memberID]
-                        nick = member.name
-                        unparsedURL = {'artist' : artist , 'track' : track , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
-                        parsedURL = urllib.parse.urlencode(unparsedURL)
-                        res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
-                        content = json.loads(res2.text)
-                        playCount = content['track']['userplaycount']
-                        image = content['track']['album']['image'][2]['#text']
-                        if(playCount!='0'):
-                            leaderBoard[nick] = int(playCount)
+            async with ctx.typing(): 
+                tmpdata = self.firebaseObj.get('/lastfm' , None)
+                data = dict()
+                for key,value in tmpdata.items(): 
+                    for subKey, subVal in value.items():
+                        data[subKey] = subVal
+                artist = ""
+                track= ""
+                userid = str(ctx.message.author.id)
+                if(userid not in data):
+                    await ctx.send("Please set your last fm account first")
+                    return ;
+                else:
+                    fmuname = data[userid]
+                    res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                    content = json.loads(res.text)
+                    trackitem = content["recenttracks"]["track"][0]
+                    artist = trackitem["artist"]["#text"]
+                    track = trackitem["name"]
+            
+                    leaderBoard = dict()
+                    image = ""
+                    async for member in ctx.guild.fetch_members(limit = None):
+                        memberID = str(member.id)
+                        if(memberID in data):
+                            uname = data[memberID]
+                            nick = member.name
+                            unparsedURL = {'artist' : artist , 'track' : track , 'username' : uname , 'api_key' : LAST_FM_TOKEN , 'format' : 'json'}
+                            parsedURL = urllib.parse.urlencode(unparsedURL)
+                            res2 = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getinfo&' + parsedURL)
+                            content = json.loads(res2.text)
+                            playCount = content['track']['userplaycount']
+                            image = content['track']['album']['image'][2]['#text']
+                            if(playCount!='0'):
+                                leaderBoard[nick] = int(playCount)
 
-                leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
-                description = ""
-                ctr = 0
-                for key,value in leaderBoard:
-                    ctr+=1
-                    description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
+                    leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
+                    description = ""
+                    ctr = 0
+                    for key,value in leaderBoard:
+                        ctr+=1
+                        description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
-                embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
-                embed.set_thumbnail(url = image)
-                embed.set_footer(text = "requested by " + ctx.message.author.name)
-                await ctx.send(embed = embed)    
+                    embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
+                    embed.set_thumbnail(url = image)
+                    embed.set_footer(text = "requested by " + ctx.message.author.name)
+                    await ctx.send(embed = embed)    
     
     @commands.command(aliases = ['fmta' , 'fmtopa' , 'fmtoparts'])
     async def fmtopartists(self , ctx , query):
-        sender = ctx.message.author
-        discordUser = sender
-        embed = await self.getTopArtists(discordUser , sender, query)
-        if(embed != None):
-            await ctx.send(embed = embed)
-        else:
-            await ctx.reply("Invalid user" , mention_author = True)
+        async with ctx.typing():
+            sender = ctx.message.author
+            discordUser = sender
+            embed = await self.getTopArtists(discordUser , sender, query)
+            if(embed != None):
+                await ctx.send(embed = embed)
+            else:
+                await ctx.reply("Invalid user" , mention_author = True)
 
     @fmtopartists.error
     async def fmtaerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            query = '0'
-            member = ctx.message.author
-            embed = await self.getTopArtists(member , member , query)
-            if(embed !=None):
-                await ctx.send(embed = embed)
-            else:
-                await ctx.reply("Invalid user" , mention_author = True)
+            async with ctx.typing():
+                query = '0'
+                member = ctx.message.author
+                embed = await self.getTopArtists(member , member , query)
+                if(embed !=None):
+                    await ctx.send(embed = embed)
+                else:
+                    await ctx.reply("Invalid user" , mention_author = True)
         
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Invalid arguments" , mention_author = True)
 
     @commands.command(aliases = ['fmtt' , 'fmtoptr' , 'fmttracks'])
     async def fmtoptracks(self , ctx , query):
-        sender = ctx.message.author
-        discordUser = sender
-        embed = await self.getTopAlbumsTracks(discordUser , sender , 0 , query)
-        if(embed != None):
-            await ctx.send(embed = embed)
-        else:
-            await ctx.reply("Invalid user" , mention_author = True)
+        async with ctx.typing():
+            sender = ctx.message.author
+            discordUser = sender
+            embed = await self.getTopAlbumsTracks(discordUser , sender , 0 , query)
+            if(embed != None):
+                await ctx.send(embed = embed)
+            else:
+                await ctx.reply("Invalid user" , mention_author = True)
 
     @fmtoptracks.error
     async def fmtterr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            member = ctx.message.author
-            query = 'o'
-            embed = await self.getTopAlbumsTracks(member , member , 0 , query)
-            if(embed !=None):
-                await ctx.send(embed = embed)
-            else:
-                await ctx.reply("Invalid user" , mention_author = True)
-        
+            async with ctx.typing():
+                member = ctx.message.author
+                query = 'o'
+                embed = await self.getTopAlbumsTracks(member , member , 0 , query)
+                if(embed !=None):
+                    await ctx.send(embed = embed)
+                else:
+                    await ctx.reply("Invalid user" , mention_author = True)
+            
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Invalid arguments" , mention_author = True)
     
     @commands.command(aliases = ['fmtal' , 'fmtopal' , 'fmtalbums'])
     async def fmtopalbums(self , ctx , query):
-        sender = ctx.message.author
-        discordUser = sender
-        embed = await self.getTopAlbumsTracks(discordUser , sender , 1 , query)
-        if(embed != None):
-            await ctx.send(embed = embed)
-        else:
-            await ctx.reply("Invalid user" , mention_author = True)
+        async with ctx.typing():
+            sender = ctx.message.author
+            discordUser = sender
+            embed = await self.getTopAlbumsTracks(discordUser , sender , 1 , query)
+            if(embed != None):
+                await ctx.send(embed = embed)
+            else:
+                await ctx.reply("Invalid user" , mention_author = True)
 
     @fmtopalbums.error
     async def fmtopalerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            member = ctx.message.author
-            query = 'o'
-            embed = await self.getTopAlbumsTracks(member , member , 1 , query)
-            if(embed !=None):
-                await ctx.send(embed = embed)
-            else:
-                await ctx.reply("Invalid user" , mention_author = True)
+            async with ctx.typing():
+                member = ctx.message.author
+                query = 'o'
+                embed = await self.getTopAlbumsTracks(member , member , 1 , query)
+                if(embed !=None):
+                    await ctx.send(embed = embed)
+                else:
+                    await ctx.reply("Invalid user" , mention_author = True)
         
         if isinstance(err , commands.BadArgument):
             await ctx.reply("Invalid arguments" , mention_author = True)
 
     @commands.command(aliases = ['fma' , 'fmainfo'])
     async def fmartistinfo(self , ctx , *args):
-        if(args==()):
-            member = ctx.message.author
-            trackoutput = await self.getCurrentTrack(member , member)
-            if(trackoutput==None):
-                await ctx.send("Set your last fm account first")
-                return ;
-            artist = trackoutput["trackartist"]
-            output = await self.getArtistInfo(artist)
-            if(output==None):
-                await ctx.send("Invalid artist")
+        async with ctx.typing():
+            if(args==()):
+                member = ctx.message.author
+                trackoutput = await self.getCurrentTrack(member , member)
+                if(trackoutput==None):
+                    await ctx.send("Set your last fm account first")
+                    return ;
+                artist = trackoutput["trackartist"]
+                output = await self.getArtistInfo(artist)
+                if(output==None):
+                    await ctx.send("Invalid artist")
+                else:
+                    await ctx.send(embed = output)
             else:
-                await ctx.send(embed = output)
-        else:
-            artist = args
-            artistname = ""
-            for i in artist:
-                artistname = artistname + " " + i
+                artist = args
+                artistname = ""
+                for i in artist:
+                    artistname = artistname + " " + i
 
-            output = await self.getArtistInfo(artistname.strip())
-            if(output==None):
-                await ctx.send("Invalid artist")
-            else:
-                await ctx.send(embed = output)
+                output = await self.getArtistInfo(artistname.strip())
+                if(output==None):
+                    await ctx.send("Invalid artist")
+                else:
+                    await ctx.send(embed = output)
           
     @commands.command(aliases = ['l' , 'fmlyr' , 'lyr'])
     async def fmlyrics(self , ctx , * , args):
-        track = args.split('-')
-        if(len(track)!=2):
-            await ctx.send("Send trackname in valid format which is `<Artist> - <trackname>`")
-        else:
-            lyrics = await self.getLyricsObject(track[0].strip() , track[1].strip())
-            result = list(filter(lambda x : x != '', lyrics.lyrics.split('\n\n')))
-            pages = []
-            for i in range(1 , len(result) + 1):
-                embed = discord.Embed(title = "Lyrics for **{}** - page {}".format(args , i) , description = result[i-1] , color = 0xffff64)
-                embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name))
-                pages.append(embed)
-            
-            paginator = Paginator(pages = pages)
-            await paginator.start(ctx)
+        async with ctx.typing():
+            track = args.split('-')
+            if(len(track)!=2):
+                await ctx.send("Send trackname in valid format which is `<Artist> - <trackname>`")
+            else:
+                lyrics = await self.getLyricsObject(track[0].strip() , track[1].strip())
+                result = list(filter(lambda x : x != '', lyrics.lyrics.split('\n\n')))
+                pages = []
+                for i in range(1 , len(result) + 1):
+                    embed = discord.Embed(title = "Lyrics for **{}** - page {}".format(args , i) , description = result[i-1] , color = 0xffff64)
+                    embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name))
+                    pages.append(embed)
+                
+                paginator = Paginator(pages = pages)
+                await paginator.start(ctx)
         
     @fmlyrics.error
     async def fmlerr(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
-            track = await self.getCurrentTrack(ctx.message.author , ctx.message.author)
-            lyricsobj = await self.getLyricsObject(track["trackartist"] , track["trackname"])
-            result = list(filter(lambda x : x != '', lyricsobj.lyrics.split('\n\n')))
-            pages = []
-            for i in range(1 , len(result) + 1):
-                embed = discord.Embed(title = "Lyrics for **{} - {}** - page {}".format(track["trackartist"] , track["trackname"] , i) , description = result[i-1] , color = 0xffff64)
-                embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name))
-                embed.set_thumbnail(url = track["trackimg"])
-                pages.append(embed)
-            
-            paginator = Paginator(pages = pages)
-            await paginator.start(ctx)
+            async with ctx.typing():
+                track = await self.getCurrentTrack(ctx.message.author , ctx.message.author)
+                lyricsobj = await self.getLyricsObject(track["trackartist"] , track["trackname"])
+                result = list(filter(lambda x : x != '', lyricsobj.lyrics.split('\n\n')))
+                pages = []
+                for i in range(1 , len(result) + 1):
+                    embed = discord.Embed(title = "Lyrics for **{} - {}** - page {}".format(track["trackartist"] , track["trackname"] , i) , description = result[i-1] , color = 0xffff64)
+                    embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name))
+                    embed.set_thumbnail(url = track["trackimg"])
+                    pages.append(embed)
+                
+                paginator = Paginator(pages = pages)
+                await paginator.start(ctx)
 
     @commands.command(aliases = ['fmcomerge' , 'fmm' , 'fmcm' , ])
     async def fmcovermerge(self , ctx):
-        member = ctx.message.author
-        output = await self.getCurrentTrack(member , member)
-        if(output["trackimg"]==""):
-            await ctx.reply('No cover url on last fm :pensive:' , mention_author = True)
-        else:
-            newobj = ImageClass()
-            await newobj.mergeImages(member.avatar_url , output["trackimg"])
-            fil = discord.File('out.png')
-            embed = discord.Embed(title = "Merged pictures")
-            embed.set_image(url = "attachment://out.png")
-            await ctx.send(embed = embed , file = fil)
+        async with ctx.typing():
+            member = ctx.message.author
+            output = await self.getCurrentTrack(member , member)
+            if(output["trackimg"]==""):
+                await ctx.reply('No cover url on last fm :pensive:' , mention_author = True)
+            else:
+                newobj = ImageClass()
+                await newobj.mergeImages(member.avatar_url , output["trackimg"])
+                fil = discord.File('out.png')
+                embed = discord.Embed(title = "Merged pictures")
+                embed.set_image(url = "attachment://out.png")
+                await ctx.send(embed = embed , file = fil)
 
     # @commands.command(aliases = ['setc' , 'embedc'])
     # async def setembedcolor(self , ctx , hex):
