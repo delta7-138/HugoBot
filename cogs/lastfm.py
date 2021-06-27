@@ -698,9 +698,13 @@ class Lastfm(commands.Cog):
                 lyrics = await self.getLyricsObject(track[0].strip() , track[1].strip())
                 result = list(filter(lambda x : x != '', lyrics.lyrics.split('\n\n')))
                 pages = []
+                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=track.getInfo' , params = {'api_key' : LAST_FM_TOKEN , 'artist' : track[0].strip() , 'track' : track[1].strip() , 'format' : 'json'})
+                content = res.json()
+                trackurl = content["track"]["album"]["image"][3]["#text"]
                 for i in range(1 , len(result) + 1):
                     embed = discord.Embed(title = "Lyrics for **{}** - page {}".format(args , i) , description = result[i-1] , color = 0xffff64)
-                    embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name))
+                    embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name) , icon_url = ctx.message.author.avatar_url)
+                    embed.set_thumbnail(url = trackurl)
                     pages.append(embed)
                 
                 paginator = Paginator(pages = pages)
@@ -716,7 +720,7 @@ class Lastfm(commands.Cog):
                 pages = []
                 for i in range(1 , len(result) + 1):
                     embed = discord.Embed(title = "Lyrics for **{} - {}** - page {}".format(track["trackartist"] , track["trackname"] , i) , description = result[i-1] , color = 0xffff64)
-                    embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name))
+                    embed.set_footer(text = "requested by {} and provided by Genius API".format(ctx.message.author.name) , icon_url = ctx.message.author.avatar_url)
                     embed.set_thumbnail(url = track["trackimg"])
                     pages.append(embed)
                 
