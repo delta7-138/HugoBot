@@ -15,7 +15,7 @@ class ImageClass():
         im2.save('2.png')
         im1arr = cv.imread('1.png')
         im2arr = cv.imread('2.png')
-        res = cv.addWeighted(im2arr , 1 , im1arr , 0.6 , 0)
+        res = cv.addWeighted(im2arr , 0.6 , im1arr , 1 , 0)
         cv.imwrite('out.png' , res)
     
     async def getDomninantColor(self , url):
