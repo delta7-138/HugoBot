@@ -8,19 +8,18 @@ class User(commands.Cog):
 
     @commands.command(aliases = ['av' , 'avtr'])
     async def avatar(self , ctx , member : discord.Member):
-        newobj = ImageClass()
-        domHex = await newobj.getDomninantColor(member.avatar_url)
+        obj = ImageClass()
+        domHex = await obj.getDomninantColor(member.avatar_url)
         embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
         embed.set_image(url = member.avatar_url)
-        embed.set_footer(text = "with the help of [Pacchu's Apis](http://api.itspacchu.tk/)")
         await ctx.reply(embed = embed , mention_author = True)
 
     @avatar.error
     async def avatar_err(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
-            newobj = ImageClass()
-            domHex = await newobj.getDomninantColor(member.avatar_url)
+            obj = ImageClass()
+            domHex = await obj.getDomninantColor(member.avatar_url)
             embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
             embed.set_image(url = member.avatar_url)
             await ctx.reply(embed = embed ,mention_author = True)
@@ -36,6 +35,22 @@ class User(commands.Cog):
         embed = discord.Embed(title = "Merged Avatars")
         embed.set_image(url = 'attachment://out.png')
         await ctx.reply(embed = embed , file = fil , mention_author = True)
+
+    @commands.command(aliases = ['invc' , 'ic' , 'iuc'])
+    async def colorInvertUrl(self , ctx , url):
+        newobj = ImageClass()
+        await newobj.getColorInvert(url)
+        fil = discord.File('outpic.png')
+        await ctx.send(file = fil)
+    
+    @colorInvertUrl.error
+    async def colorinv_error(self , ctx , err):
+        if isinstance(err, commands.MissingRequiredArgument):
+            url = ctx.message.author.avatar_url
+            newobj = ImageClass()
+            await newobj.getColorInvert(url)
+            fil = discord.File('outpic.png')
+            await ctx.send(file = fil)
 
 def setup(bot):
     bot.add_cog(User(bot))
