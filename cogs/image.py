@@ -3,6 +3,8 @@ import numpy as np
 import cv2 as cv
 import json 
 from PIL import Image
+import os
+from math import *
 
 class ImageClass():
 
@@ -34,6 +36,22 @@ class ImageClass():
         im1arr = cv.imread('invtmp.png' , cv.IMREAD_COLOR)
         imageres = cv.bitwise_not(im1arr)
         cv.imwrite('outpic.png' , imageres)
+
+    async def concatImage(self , l):
+        dim = int(floor(sqrt(len(l))))
+        finImgList = []
+        for i in range(0 , len(l) , dim):
+            buffer = []
+            for j in range(i , i+dim):
+                imtmp = Image.open(requests.get(l[j] , stream = True).raw)
+                imtmp.save('concat.png')
+                cvobj = cv.imread('concat.png')
+                buffer.append(cvobj)
+                os.remove('concat.png')
+            
+            finImgList.append(cv.hconcat(buffer))
         
+        finalImage = cv.vconcat(finImgList)
+        cv.imwrite('chart.png' , finalImage)        
 
 

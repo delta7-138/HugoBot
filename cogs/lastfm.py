@@ -729,6 +729,33 @@ class Lastfm(commands.Cog):
     #             await ctx.send('Embed color updated successfully')
     #         except:
     #             await ctx.send('Send valid hex code')
+    @commands.command(aliases = ['fmr' , 'fmrc' , 'fmrecent'])
+    async def fmrecentchart(self , ctx):
+        async with ctx.typing():
+            tmpdata = self.firebaseObj.get('/lastfm' , None)
+            data = dict()
+            for key,value in tmpdata.items(): 
+                for subKey, subVal in value.items():
+                    data[subKey] = subVal
+                    
+            userid = str(ctx.message.author.id)
+            if(userid not in data):
+                await ctx.reply('not a valid user')
+            else:
+                fmuname = data[userid]
+                res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                content = json.loads(res.text)
+                trackList = content["recenttracks"]["track"]
+                urlList = []
+                for i in range(9):
+                    trackalbumurl = trackList[i]["image"][2]["#text"]
+                    urlList.append(trackalbumurl)
+
+                newImageobj = ImageClass()
+                await newImageobj.concatImage(urlList)
+            
+                fil = discord.File('chart.png')
+                await ctx.send(file = fil)
                 
         
 def setup(bot):
