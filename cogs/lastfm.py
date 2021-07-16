@@ -730,8 +730,12 @@ class Lastfm(commands.Cog):
     #         except:
     #             await ctx.send('Send valid hex code')
     @commands.command(aliases = ['fmr' , 'fmrc' , 'fmrecent'])
-    async def fmrecentchart(self , ctx):
+    async def fmrecentchart(self , ctx , args):
         async with ctx.typing():
+            size = 0
+            if(args==None):
+                size = 9
+            size = int(args) * int(args)
             tmpdata = self.firebaseObj.get('/lastfm' , None)
             data = dict()
             for key,value in tmpdata.items(): 
@@ -747,7 +751,7 @@ class Lastfm(commands.Cog):
                 content = json.loads(res.text)
                 trackList = content["recenttracks"]["track"]
                 urlList = []
-                for i in range(9):
+                for i in range(size):
                     trackalbumurl = trackList[i]["image"][2]["#text"]
                     urlList.append(trackalbumurl)
 
