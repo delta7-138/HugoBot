@@ -764,34 +764,31 @@ class Lastfm(commands.Cog):
     async def fmrerror(self , ctx , err):
         if isinstance(err , commands.MissingRequiredArgument):
             async with ctx.typing():
-                try:
-                    size = 9
-                    tmpdata = self.firebaseObj.get('/lastfm' , None)
-                    data = dict()
-                    for key,value in tmpdata.items(): 
-                        for subKey, subVal in value.items():
-                            data[subKey] = subVal
-                            
-                    userid = str(ctx.message.author.id)
-                    if(userid not in data):
-                        await ctx.reply('not a valid user')
-                    else:
-                        fmuname = data[userid]
-                        res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
-                        content = json.loads(res.text)
-                        trackList = content["recenttracks"]["track"]
-                        urlList = []
-                        for i in range(size):
-                            trackalbumurl = trackList[i]["image"][2]["#text"]
-                            urlList.append(trackalbumurl)
+                size = 9
+                tmpdata = self.firebaseObj.get('/lastfm' , None)
+                data = dict()
+                for key,value in tmpdata.items(): 
+                    for subKey, subVal in value.items():
+                        data[subKey] = subVal
+                        
+                userid = str(ctx.message.author.id)
+                if(userid not in data):
+                    await ctx.reply('not a valid user')
+                else:
+                    fmuname = data[userid]
+                    res = requests.get('http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=' + fmuname + '&api_key=' + LAST_FM_TOKEN + '&format=json') 
+                    content = json.loads(res.text)
+                    trackList = content["recenttracks"]["track"]
+                    urlList = []
+                    for i in range(size):
+                        trackalbumurl = trackList[i]["image"][2]["#text"]
+                        urlList.append(trackalbumurl)
 
-                        newImageobj = ImageClass()
-                        await newImageobj.concatImage(urlList)
-                    
-                        fil = discord.File('chart.png')
-                        await ctx.send(file = fil)
-                except: 
-                    await ctx.reply('Enter a number between `3` and `7` for chart dimension' , mention_author = True)
+                    newImageobj = ImageClass()
+                    await newImageobj.concatImage(urlList)
+                
+                    fil = discord.File('chart.png')
+                    await ctx.send(file = fil)
 
 
                 
