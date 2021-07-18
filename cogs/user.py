@@ -1,4 +1,6 @@
 import discord
+import urllib.parse as urlparse
+import json
 from discord.ext import commands
 from .image import ImageClass
 
@@ -51,6 +53,14 @@ class User(commands.Cog):
             await newobj.getColorInvert(url)
             fil = discord.File('outpic.png')
             await ctx.send(file = fil)
-
+    
+    @commands.command(aliases = ['tl' , 's'])
+    async def tellme(self , ctx , * , args): 
+        queryString = urlparse.urlencode({'q' : args})
+        baseUrl = 'https://api.duckduckgo.com/?format=json&pretty=1'
+        res = requests.get(baseUrl , params = queryString)
+        content = json.loads(res.text)
+        
+        
 def setup(bot):
     bot.add_cog(User(bot))
