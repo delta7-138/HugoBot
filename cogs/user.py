@@ -67,7 +67,9 @@ class User(commands.Cog):
         channel = ctx.channel
         guild_id = ctx.message.guild.id
         channel_id = channel.id
-        messages = await channel.history(limit=369 , oldest_first = True).flatten()
+        days = random.randint(0 , 200)
+        random_date = datetime.datetime.now() - datetime.timedelta(days = days)
+        messages = await channel.history(limit=369 , oldest_first = True , after = random_date).flatten()
         randinx = len(messages) - random.randint(0 , len(messages))
         msgobj = messages[randinx]
         embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
