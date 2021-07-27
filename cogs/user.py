@@ -60,6 +60,18 @@ class User(commands.Cog):
         baseUrl = 'https://api.duckduckgo.com/?format=json&pretty=1'
         res = requests.get(baseUrl , params = queryString)
         content = json.loads(res.text)
+
+    @commands.command(aliases = ['randmsg' , 'msg'])
+    async def randommsg(self , ctx):
+        channel = ctx.channel
+        guild_id = ctx.message.guild.id
+        channel_id = channel.id
+        messages = await channel.history(limit=369).flatten()
+        randinx = len(messages) - random.randint(0 , len(messages))
+        msgobj = messages[randinx]
+        embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
+        embed.set_footer(text = "sent by {}".format(msgobj.author.name) , icon_url = msgobj.author.avatar_url)
+        await ctx.send(embed = embed)
         
         
 def setup(bot):
