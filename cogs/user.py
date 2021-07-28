@@ -74,6 +74,8 @@ class User(commands.Cog):
         randinx = len(messages) - random.randint(0 , len(messages))
         msgobj = messages[randinx]
         embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
+        if(len(msgobj.attachments)>0):
+            embed.set_image(url = msgobj.attachments[0].url)
         embed.set_footer(text = "sent by {}".format(msgobj.author.name) , icon_url = msgobj.author.avatar_url)
         await ctx.send(embed = embed)
         
