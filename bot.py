@@ -102,13 +102,6 @@ async def cvhelp(ctx):
     await ctx.send(embed = embed)
 
 
-@client.command()
-async def urmom(ctx , member : discord.Member):
-    res = requests.get('https://api.yomomma.info/')
-    content = json.loads(res.text)
-    joke = content["joke"]
-    mention = member.mention
-    await ctx.send(mention + " " + joke)
 
 @urmom.error
 async def urmomiserror(ctx , err):
