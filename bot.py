@@ -103,14 +103,6 @@ async def cvhelp(ctx):
 
 
 
-@urmom.error
-async def urmomiserror(ctx , err):
-    if isinstance(err , commands.MissingRequiredArgument):
-        res = requests.get('https://api.yomomma.info/')
-        content = json.loads(res.text)
-        joke = content["joke"]
-        mention = ctx.message.author.mention
-        await ctx.send(mention + " " + joke)
 
 
 @client.command(aliases = ['tpdne' , 'ne'])
