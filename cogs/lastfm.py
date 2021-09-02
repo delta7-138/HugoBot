@@ -14,6 +14,8 @@ import lyricsgenius as lg
 from io import BytesIO
 from pygicord import Paginator
 from PIL import Image
+# from dotenv import load_dotenv
+# load_dotenv()
 
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
@@ -25,9 +27,19 @@ class Lastfm(commands.Cog):
         self.firebaseObj = firebase.FirebaseApplication(FIREBASE_URL)
         self.genius = lg.Genius(GENIUS_TOKEN)
  
+    async def deleteFMUser(self , userid):
+        userid = str(userid)
+        tmpdata = self.firebaseObj.get('/lastfm' , None)
+        data = dict()
+        for key,value in tmpdata.items(): 
+            for subKey, subVal in value.items():
+                if(subKey==userid):
+                    self.firebaseObj.delete('/lastfm/{}'.format(key) , None)
+                    return 0
+        return 1
 
     async def getArtistInfo(self , artist):
-        MAX_VAL = 5900000
+        MAX_VAL = 6000000
     
         
         queryString = urllib.parse.urlencode({'artist' : artist})
@@ -192,6 +204,7 @@ class Lastfm(commands.Cog):
 
             userid = str(ctx.message.author.id)
             fmuname = args[0]
+            
 
 
             for key, value in data.items(): 
@@ -791,7 +804,14 @@ class Lastfm(commands.Cog):
                     await ctx.send(file = fil)
 
 
-                
+    @commands.command(aliases = ['del' , 'd' , 'remove' , 'fmremove'])
+    async def fmdelete(self , ctx):
+        res = await self.deleteFMUser(ctx.message.author.id)
+        if(res==0):
+            await ctx.send('User deleted successfully')
+        else:
+            await ctx.send('Could not delete, error!')
+
         
 def setup(bot):
     bot.add_cog(Lastfm(bot))

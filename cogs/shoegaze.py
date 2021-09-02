@@ -9,7 +9,8 @@ from PIL import Image
 from math import *
 from discord.ext import commands
 from .kernelconvol import *
-
+# from dotenv import load_dotenv
+# load_dotenv()
 
 class Shoegaze(commands.Cog):
     def __init__(self , bot):
