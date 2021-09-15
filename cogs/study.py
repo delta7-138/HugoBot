@@ -26,7 +26,7 @@ class Study(commands.Cog):
         self.firebase = pyrebase.initialize_app(firebaseConfig)
         self.db = self.firebase.database()
 
-    async def add_time(obj1 , obj2):
+    async def add_time(self , obj1 , obj2):
         h1 = obj1.hour;
         h2 = obj2.hour;
 
@@ -44,7 +44,7 @@ class Study(commands.Cog):
 
         sum_h = int((h1 + h2 + carry_m))
         finaltime = "{sum_h}:{sum_m}:{sum_s}".format(sum_h = sum_h , sum_m = sum_m , sum_s = sum_s)
-        finaltimeobj = datetime.datetime.strptime(finaltime , "%H:%M:%S")
+        finaltimeobj = datetime.strptime(finaltime , "%H:%M:%S")
         return finaltimeobj
 
     @commands.command(aliases = ['stz'])
@@ -99,6 +99,24 @@ class Study(commands.Cog):
                 await ctx.reply("You studied for {} hours , {} minutes , {} seconds".format(hours , mins , seconds) , mention_author = True)
             else:
                 await ctx.reply("No ongoing session" , mention_author = True)
+
+    @commands.command(aliases = ['stats' , 'daily'])
+    async def dailystats(self , ctx):
+        userid = ctx.message.author.id
+        check = self.db.child('study').child(userid).get()
+        if(check.val()==None):
+            await ctx.reply("Set time zone first!" , mention_author = True)
+        else:
+            date = datetime.strftime(datetime.today() , "%d-%m-%Y")
+            logs = self.db.child('study').child(userid).child('logs').get().val()
+            totalTime = time(0 , 0 , 0)
+            for i in logs[1:]:
+                if(date==i["date"]):
+                    timeobj = time(i["hours"] , i["mins"] , i["secs"])
+                    totalTime = await self.add_time(timeobj , totalTime)
+            
+            await ctx.reply("You studied for {} hours {} minutes {} seconds! today".format(totalTime.hour , totalTime.minute , totalTime.second) , mention_author = True)
+
 
 def setup(bot):
     bot.add_cog(Study(bot))

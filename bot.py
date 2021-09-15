@@ -17,8 +17,8 @@ import urllib.parse
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-#from dotenv import load_dotenv
-#load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
