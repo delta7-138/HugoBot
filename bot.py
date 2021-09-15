@@ -25,7 +25,7 @@ FIREBASE_URL = os.getenv('FIREBASE_URL')
 
 intents = discord.Intents.default()
 intents.members = True
-client = commands.Bot(command_prefix = 'o.' , intents = intents)
+client = commands.Bot(command_prefix = 'h.' , intents = intents)
 cogs = ['cogs.color' , 'cogs.codeforces' , 'cogs.randomfunc' , 'cogs.mars' , 'cogs.lastfm' , 'cogs.user' , 'cogs.quotes' , 'cogs.teleport' , 'cogs.covid' , 'cogs.shoegaze' , 'cogs.study']
 
 for cog in cogs:

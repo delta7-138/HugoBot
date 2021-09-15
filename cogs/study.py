@@ -71,6 +71,7 @@ class Study(commands.Cog):
                 now = datetime.now()
                 stringnow = datetime.strftime(now , "%d-%M-%Y %H:%m:%S")
                 self.db.child('study').child(userid).update({"pending" : ["0", stringnow]})
+                await ctx.reply("Session started!" , mention_author = True)
             else:
                 await ctx.reply("Session already going on!" , mention_author = True)
     
