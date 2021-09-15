@@ -11,3 +11,5 @@ opencv-python
 lyricsgenius
 pygicord
 tqdm 
+pyrebase
+protobuf==3.17.3

@@ -17,9 +17,8 @@ import urllib.parse
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-
-# from dotenv import load_dotenv
-# load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
@@ -27,7 +26,7 @@ FIREBASE_URL = os.getenv('FIREBASE_URL')
 intents = discord.Intents.default()
 intents.members = True
 client = commands.Bot(command_prefix = 'o.' , intents = intents)
-cogs = ['cogs.color' , 'cogs.codeforces' , 'cogs.randomfunc' , 'cogs.mars' , 'cogs.lastfm' , 'cogs.user' , 'cogs.quotes' , 'cogs.teleport' , 'cogs.covid' , 'cogs.shoegaze']
+cogs = ['cogs.color' , 'cogs.codeforces' , 'cogs.randomfunc' , 'cogs.mars' , 'cogs.lastfm' , 'cogs.user' , 'cogs.quotes' , 'cogs.teleport' , 'cogs.covid' , 'cogs.shoegaze' , 'cogs.study']
 
 for cog in cogs:
     client.load_extension(cog)
@@ -42,26 +41,7 @@ for key,value in tmpdata.items():
      for subKey, subVal in value.items():
          data[subKey] = subVal
 
-async def add_time(obj1 , obj2):
-    h1 = obj1.hour;
-    h2 = obj2.hour;
 
-    m1 = obj1.minute;
-    m2 = obj2.minute;
-
-    s1 = obj1.second;
-    s2 = obj2.second;
-
-    carry_s = int((s1 + s2)/60)
-    sum_s = int((s1+s2)%60)
-
-    carry_m = int((m1 + m2 + carry_s)/60)
-    sum_m = int((m1 + m2 + carry_s)%60)
-
-    sum_h = int((h1 + h2 + carry_m))
-    finaltime = "{sum_h}:{sum_m}:{sum_s}".format(sum_h = sum_h , sum_m = sum_m , sum_s = sum_s)
-    finaltimeobj = datetime.datetime.strptime(finaltime , "%H:%M:%S")
-    return finaltimeobj
 
 @client.event
 async def on_ready():
@@ -116,96 +96,88 @@ async def thispersondoesnotexist(ctx):
     buffer.seek(0)
     await ctx.send(file = fil)
 
-@client.command(aliases = ['stz'])
-async def settimezone(ctx , *args):
-    tz = args[0]
-    tmp = {str(ctx.message.author.id) : {"timezone" : tz , "logs" : ["0"]}}
-    result = firebaseObj.post('/study' , tmp)
-    print(result)
-    await ctx.message.add_reaction("✅")
-    await ctx.reply("Successfully added" , mention_author = True)
 
-@client.command(aliases = ['astl' , 'astlog'])
-async def addstudylog(ctx , *args):
-    studydata = firebaseObj.get('/study' , None)
-    studylogs = list(studydata.values())
-    author_id = str(ctx.message.author.id)
-    index = 0
-    for i in range(len(studylogs)):
-        tmp = studylogs[i]
-        for key,value in tmp.items():
-            if(key==author_id):
-                index = i
+# @client.command(aliases = ['astl' , 'astlog'])
+# async def addstudylog(ctx , *args):
+#     studydata = firebaseObj.get('/study' , None)
+#     studylogs = list(studydata.values())
+#     author_id = str(ctx.message.author.id)
+#     index = 0
+#     for i in range(len(studylogs)):
+#         tmp = studylogs[i]
+#         for key,value in tmp.items():
+#             if(key==author_id):
+#                 index = i
     
-    studydata_id = list(studydata.keys())[index]
-    tz = studylogs[index][author_id]["timezone"]
-    logs = studylogs[index][author_id]["logs"]
-    now_time_utc = datetime.datetime.now(pytz.timezone("UTC"))
-    actual_now = now_time_utc.astimezone(pytz.timezone(tz))
-    start = args[0]
-    end = args[1]
-    obj1 = datetime.datetime.strptime(start , "%H%M")
-    obj2 = datetime.datetime.strptime(end , "%H%M")
-    if(obj2<obj1):
-        tmp = start
-        start = end
-        end = tmp
-        tmp = obj1 
-        obj1 = obj2
-        obj2 = tmp
+#     studydata_id = list(studydata.keys())[index]
+#     tz = studylogs[index][author_id]["timezone"]
+#     logs = studylogs[index][author_id]["logs"]
+#     now_time_utc = datetime.datetime.now(pytz.timezone("UTC"))
+#     actual_now = now_time_utc.astimezone(pytz.timezone(tz))
+#     start = args[0]
+#     end = args[1]
+#     obj1 = datetime.datetime.strptime(start , "%H%M")
+#     obj2 = datetime.datetime.strptime(end , "%H%M")
+#     if(obj2<obj1):
+#         tmp = start
+#         start = end
+#         end = tmp
+#         tmp = obj1 
+#         obj1 = obj2
+#         obj2 = tmp
 
-    diff_time = str(obj2 - obj1)
-    user = ctx.message.author
-    nick = user.name
-    if(user.nick!=None):
-        nick = user.nick
-    embed = discord.Embed(title = "Study Log for " + actual_now.strftime('%d-%m-%Y') , color = 0x573ed6)
-    embed.add_field(name = "Start" , value = start , inline = True)
-    embed.add_field(name = "End" , value = end , inline = True)
-    embed.add_field(name = "Time Spent" , value = diff_time , inline = False)
-    embed.set_thumbnail(url = "https://cdn.corporatefinanceinstitute.com/assets/10-Poor-Study-Habits-Opener.jpeg")
-    embed.set_footer(text = "requested by {}".format(nick))
-    log = {"str" : start , "end" : end , "diff" : diff_time , "date" : actual_now.strftime('%d-%m-%Y')}
-    logs.append(log)
-    res = firebaseObj.put('/study/' + studydata_id + '/' + author_id , "logs" , logs)
-    await ctx.message.add_reaction("✅")
-    await ctx.reply(embed = embed , mention_author = True)
+#     diff_time = str(obj2 - obj1)
+#     user = ctx.message.author
+#     nick = user.name
+#     if(user.nick!=None):
+#         nick = user.nick
+#     embed = discord.Embed(title = "Study Log for " + actual_now.strftime('%d-%m-%Y') , color = 0x573ed6)
+#     embed.add_field(name = "Start" , value = start , inline = True)
+#     embed.add_field(name = "End" , value = end , inline = True)
+#     embed.add_field(name = "Time Spent" , value = diff_time , inline = False)
+#     embed.set_thumbnail(url = "https://cdn.corporatefinanceinstitute.com/assets/10-Poor-Study-Habits-Opener.jpeg")
+#     embed.set_footer(text = "requested by {}".format(nick))
+#     log = {"str" : start , "end" : end , "diff" : diff_time , "date" : actual_now.strftime('%d-%m-%Y')}
+#     logs.append(log)
+#     res = firebaseObj.put('/study/' + studydata_id + '/' + author_id , "logs" , logs)
+#     await ctx.message.add_reaction("✅")
+#     await ctx.reply(embed = embed , mention_author = True)
 
-@client.command(aliases = ['caltotdate' , 'caldate' , 'cltd'])
-async def calculatetotaltimebydate(ctx , *args):
-    date = args[0]  
-    studydata = firebaseObj.get('/study' , None)
-    studylogs = list(studydata.values())
-    author_id = str(ctx.message.author.id)
-    index = 0
-    for i in range(len(studylogs)):
-        tmp = studylogs[i]
-        for key,value in tmp.items():
-            if(key==author_id):
-                index = i
+# @client.command(aliases = ['caltotdate' , 'caldate' , 'cltd'])
+# async def calculatetotaltimebydate(ctx , *args):
+#     date = args[0]  
+#     studydata = firebaseObj.get('/study' , None)
+#     studylogs = list(studydata.values())
+#     author_id = str(ctx.message.author.id)
+#     index = 0
+#     for i in range(len(studylogs)):
+#         tmp = studylogs[i]
+#         for key,value in tmp.items():
+#             if(key==author_id):
+#                 index = i
 
-    logs = studylogs[index][author_id]["logs"]
-    timeobj = datetime.datetime.strptime("0:00:00" , "%H:%M:%S")
-    for i in logs[1:]:
-        if(i["date"]==date):
-            tmp = datetime.datetime.strptime(i["diff"] , "%H:%M:%S")
-            timeobj = await add_time(timeobj , tmp)
-    await ctx.message.add_reaction("✅")
-    await ctx.reply("You studied for time equal to **" + str(timeobj.time()) + "** on " + date , mention_author = True)
+#     logs = studylogs[index][author_id]["logs"]
+#     timeobj = datetime.datetime.strptime("0:00:00" , "%H:%M:%S")
+#     for i in logs[1:]:
+#         if(i["date"]==date):
+#             tmp = datetime.datetime.strptime(i["diff"] , "%H:%M:%S")
+#             timeobj = await add_time(timeobj , tmp)
+#     await ctx.message.add_reaction("✅")
+#     await ctx.reply("You studied for time equal to **" + str(timeobj.time()) + "** on " + date , mention_author = True)
 
-@client.command(aliases = ['deletelog'  'dellog' , 'dstl'])
-async def deletestudylog(ctx , *args):
-    message_id = args[0]
-    msg = await ctx.fetch_message(message_id)
-    if(msg.author!=client.user):
-        await ctx.send("invalid message :rage:")
-    else:
-        embeds = msg.embeds
-        res = embeds[0].to_dict()
-        title = str(res["title"])
-        author = res["fields"][0]["value"]
-        if(title.startswith("Study Log for") and str(author)==str(ctx.message.author)):
-            await msg.delete()
+# @client.command(aliases = ['deletelog'  'dellog' , 'dstl'])
+# async def deletestudylog(ctx , *args):
+#     message_id = args[0]
+#     msg = await ctx.fetch_message(message_id)
+#     if(msg.author!=client.user):
+#         await ctx.send("invalid message :rage:")
+#     else:
+#         embeds = msg.embeds
+#         res = embeds[0].to_dict()
+#         title = str(res["title"])
+#         author = res["fields"][0]["value"]
+#         if(title.startswith("Study Log for") and str(author)==str(ctx.message.author)):
+#             await msg.delete()
         
 @client.command(aliases = ['inv'])
 async def invite(ctx):
