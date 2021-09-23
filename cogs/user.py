@@ -64,21 +64,21 @@ class User(commands.Cog):
         res = requests.get(baseUrl , params = queryString)
         content = json.loads(res.text)
 
-    # @commands.command(aliases = ['randmsg' , 'msg'])
-    # async def randommsg(self , ctx):
-    #     channel = ctx.channel
-    #     guild_id = ctx.message.guild.id
-    #     channel_id = channel.id
-    #     days = random.randint(0 , 200)
-    #     random_date = datetime.datetime.now() - datetime.timedelta(days = days)
-    #     messages = await channel.history(limit=369 , oldest_first = True , after = random_date).flatten()
-    #     randinx = len(messages) - random.randint(0 , len(messages))
-    #     msgobj = messages[randinx]
-    #     embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
-    #     if(len(msgobj.attachments)>0):
-    #         embed.set_image(url = msgobj.attachments[0].url)
-    #     embed.set_footer(text = "sent by {}".format(msgobj.author.name) , icon_url = msgobj.author.avatar_url)
-    #     await ctx.send(embed = embed)
+    @commands.command(aliases = ['randmsg' , 'msg'])
+    async def randommsg(self , ctx):
+        channel = ctx.channel
+        guild_id = ctx.message.guild.id
+        channel_id = channel.id
+        days = random.randint(0 , 200)
+        random_date = datetime.datetime.now() - datetime.timedelta(days = days)
+        messages = await channel.history(limit=369 , oldest_first = True , after = random_date).flatten()
+        randinx = len(messages) - random.randint(0 , len(messages))
+        msgobj = messages[randinx]
+        embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
+        if(len(msgobj.attachments)>0):
+            embed.set_image(url = msgobj.attachments[0].url)
+        embed.set_footer(text = "sent by {}".format(msgobj.author.name) , icon_url = msgobj.author.avatar_url)
+        await ctx.send(embed = embed)
         
         
 def setup(bot):
