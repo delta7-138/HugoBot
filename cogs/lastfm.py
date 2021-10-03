@@ -407,7 +407,7 @@ class Lastfm(commands.Cog):
                     content = json.loads(res2.text)
                     playCount = content['album']['userplaycount']
                     image = content['album']['image'][2]['#text']
-                    if(playCount!='0'):
+                    if(playCount!=0):
                         leaderBoard[nick] = int(playCount)
             
             leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
@@ -458,7 +458,7 @@ class Lastfm(commands.Cog):
                             content = json.loads(res2.text)
                             playCount = content['album']['userplaycount']
                             image = content['album']['image'][2]['#text']
-                            if(playCount!='0'):
+                            if(playCount!=0):
                                 leaderBoard[nick] = int(playCount)
 
                     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
@@ -498,7 +498,7 @@ class Lastfm(commands.Cog):
                     content = json.loads(res2.text)
                     playCount = content['track']['userplaycount']
                     image = content['track']["album"]['image'][2]['#text']
-                    if(playCount!='0'):
+                    if(playCount!=0):
                         leaderBoard[nick] = int(playCount)
 
             leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
@@ -549,7 +549,7 @@ class Lastfm(commands.Cog):
                             content = json.loads(res2.text)
                             playCount = content['track']['userplaycount']
                             image = content['track']['album']['image'][2]['#text']
-                            if(playCount!='0'):
+                            if(playCount!=0):
                                 leaderBoard[nick] = int(playCount)
 
                     leaderBoard =  sorted(leaderBoard.items(), key=lambda item: item[1] , reverse= True)
