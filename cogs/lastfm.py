@@ -506,6 +506,8 @@ class Lastfm(commands.Cog):
             ctr = 0
             for key,value in leaderBoard:
                 ctr+=1
+                if(value==0): 
+                    continue
                 description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
             embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
@@ -557,6 +559,8 @@ class Lastfm(commands.Cog):
                     ctr = 0
                     for key,value in leaderBoard:
                         ctr+=1
+                        if(value==0):
+                            continue
                         description += str(ctr) + ". " + key + '  -  ' + '**' + str(value) + '** plays \n'
 
                     embed = discord.Embed(title = 'Who knows **' + artist + '** - ' + '**' + track + '**' , description = description , color=0x00ffea)
