@@ -14,8 +14,8 @@ import lyricsgenius as lg
 from io import BytesIO
 from pygicord import Paginator
 from PIL import Image
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')

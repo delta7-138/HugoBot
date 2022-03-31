@@ -7,8 +7,8 @@ import time
 import random
 import urllib.request
 from discord.ext import commands
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 API_TOKEN = os.getenv('API_TOKEN')   
 

@@ -17,15 +17,15 @@ import urllib.parse
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-#from dotenv import load_dotenv
-#load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 LAST_FM_TOKEN = os.getenv('LAST_FM_TOKEN')
 FIREBASE_URL = os.getenv('FIREBASE_URL')
 
 intents = discord.Intents.default()
 intents.members = True
-client = commands.Bot(command_prefix = 'h.' , intents = intents)
+client = commands.Bot(command_prefix = 'g.' , intents = intents)
 cogs = ['cogs.color' , 'cogs.codeforces' , 'cogs.randomfunc' , 'cogs.mars' , 'cogs.lastfm' , 'cogs.user' , 'cogs.quotes' , 'cogs.teleport' , 'cogs.covid' , 'cogs.shoegaze' , 'cogs.study']
 
 for cog in cogs:

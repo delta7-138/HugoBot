@@ -3,8 +3,8 @@ import requests
 import random
 import json
 from discord.ext import commands
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 class Quotes(commands.Cog):
     def __init__(self , bot):
         self.bot = bot

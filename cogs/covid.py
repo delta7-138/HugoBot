@@ -5,8 +5,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from io import BytesIO
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 
 from discord.ext import commands
 
