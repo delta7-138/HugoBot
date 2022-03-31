@@ -13,3 +13,4 @@ pygicord
 tqdm 
 pyrebase
 protobuf==3.17.3
+jwt
