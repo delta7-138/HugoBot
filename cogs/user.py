@@ -5,8 +5,9 @@ import urllib.parse as urlparse
 import json
 from discord.ext import commands
 from .image import ImageClass
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+
+#load_dotenv()
 class User(commands.Cog):
     def __init__(self , client):
         self.client = client
