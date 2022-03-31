@@ -5,8 +5,8 @@ import urllib.parse as urlparse
 import json
 from discord.ext import commands
 from .image import ImageClass
-# from dotenv import load_dotenv
-# load_dotenv()
+from dotenv import load_dotenv
+load_dotenv()
 class User(commands.Cog):
     def __init__(self , client):
         self.client = client
@@ -14,8 +14,8 @@ class User(commands.Cog):
     @commands.command(aliases = ['av' , 'avtr'])
     async def avatar(self , ctx , member : discord.Member):
         obj = ImageClass()
-        domHex = await obj.getDomninantColor(member.avatar_url)
-        embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
+        #domHex = await obj.getDomninantColor(member.avatar_url)
+        embed = discord.Embed(title = "Member avatar" , color = 0xff0000)
         embed.set_image(url = member.avatar_url)
         await ctx.reply(embed = embed , mention_author = True)
 
@@ -24,8 +24,8 @@ class User(commands.Cog):
         if isinstance(err , commands.MissingRequiredArgument):
             member = ctx.message.author
             obj = ImageClass()
-            domHex = await obj.getDomninantColor(member.avatar_url)
-            embed = discord.Embed(title = "Member avatar" , color = int(domHex , 16))
+            #domHex = await obj.getDomninantColor(member.avatar_url)
+            embed = discord.Embed(title = "Member avatar" , color = 0xff0000)
             embed.set_image(url = member.avatar_url)
             await ctx.reply(embed = embed ,mention_author = True)
         
@@ -65,20 +65,44 @@ class User(commands.Cog):
         content = json.loads(res.text)
 
     @commands.command(aliases = ['randmsg' , 'msg'])
-    async def randommsg(self , ctx):
+    async def randommsg(self , ctx , member : discord.Member):
         channel = ctx.channel
         guild_id = ctx.message.guild.id
         channel_id = channel.id
         days = random.randint(0 , 200)
         random_date = datetime.datetime.now() - datetime.timedelta(days = days)
-        messages = await channel.history(limit=369 , oldest_first = True , after = random_date).flatten()
-        randinx = len(messages) - random.randint(0 , len(messages))
-        msgobj = messages[randinx]
+        messages = await channel.history(limit=500 , oldest_first = True , after = random_date).flatten()
+        messages = list(filter(lambda m : m.author==member, messages))
+        random.shuffle(messages)
+        random.shuffle(messages)
+        if(messages==None):
+            await ctx.send("No Messages found :( try again")
+            return; 
+
+        msgobj = messages[0]
         embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
         if(len(msgobj.attachments)>0):
             embed.set_image(url = msgobj.attachments[0].url)
         embed.set_footer(text = "sent by {}".format(msgobj.author.name) , icon_url = msgobj.author.avatar_url)
         await ctx.send(embed = embed)
+    
+    @randommsg.error
+    async def rdnmesgerr(self , ctx , err):
+        if isinstance(err , commands.MissingRequiredArgument):
+            channel = ctx.channel
+            guild_id = ctx.message.guild.id
+            channel_id = channel.id
+            days = random.randint(0 , 200)
+            random_date = datetime.datetime.now() - datetime.timedelta(days = days)
+            messages = await channel.history(limit=500 , oldest_first = True , after = random_date).flatten()
+            random.shuffle(messages)
+            random.shuffle(messages)
+            msgobj = messages[0]
+            embed = discord.Embed(title = "Random message sent by user" , description = msgobj.content , url = "https://discord.com/channels/{}/{}/{}".format(guild_id , channel_id , msgobj.id) ,  color = 0xff0000)
+            if(len(msgobj.attachments)>0):
+                embed.set_image(url = msgobj.attachments[0].url)
+            embed.set_footer(text = "sent by {}".format(msgobj.author.name) , icon_url = msgobj.author.avatar_url)
+            await ctx.send(embed = embed)
         
         
 def setup(bot):
